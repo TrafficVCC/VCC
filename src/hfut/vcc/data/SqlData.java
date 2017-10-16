@@ -15,7 +15,7 @@ public class SqlData {
 	
 	private String x;
 	private String y;
-	
+	//Demo
 	//where a=b;
 	private String a;
 	private String b;
