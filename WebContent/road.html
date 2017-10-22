@@ -1,0 +1,56 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>Counted By Road</title>
+        <script src="js/d3.v3.min.js" charset="utf-8"></script>
+        <style type="text/css"></style>
+        <link rel="stylesheet" type="text/css" href="css/t.css">
+        <script type="text/javascript" src="rfunc.js" ></script>
+        <script src="js/jquery-3.2.1.js" charset="uft-8"></script>
+        <script type="text/javascript" src="rosefunc.js" ></script>
+        <script type="text/javascript" src="tfunc2.js" ></script>
+
+    </head>
+    
+    <body>
+      
+        <div>
+            <svg id="roadpie" width="500" height="500" ></svg>
+         </div>
+         <div id="roseDiv">
+            
+        </div>
+        
+        
+        <script type="text/javascript">
+        $.post("/Demo/BackServer",
+   			 {
+   			"type":"lh",   //年份
+   			"starty" :"2006",
+   			"endy" : "2016",
+   			"set" : "0"     //全体
+   	    },
+               function(data,status){
+   	    	data = eval('(' + data + ')');
+   	   //画事故数量大于num的lh的饼图
+   	    	gragh = "road"+"pie";
+
+   	    	var num;
+   	    	num = 300;
+   	    	var dataset = [];
+   	    	data.forEach(function(d, i){
+   	    	    if(d.count >= num)
+   	    	        dataset.push([d.lh, d.count]);
+   	    	});
+   	    	//小于300的lh归于其他
+   	    	dataset.push(["其他", num]);  
+
+   	    	//饼状图
+   	    	drawPie(dataset, gragh, 500, 500);
+      	        });
+        </script>
+
+    </body>
+    
+</html>
