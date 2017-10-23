@@ -6,10 +6,11 @@
         <script src="js/d3.v3.min.js" charset="utf-8"></script>
         <style type="text/css"></style>
         <link rel="stylesheet" type="text/css" href="css/t.css">
-        <script type="text/javascript" src="rfunc.js" ></script>
         <script src="js/jquery-3.2.1.js" charset="uft-8"></script>
+        <script type="text/javascript" src="data.js"></script>
         <script type="text/javascript" src="rosefunc.js" ></script>
         <script type="text/javascript" src="tfunc2.js" ></script>
+         <script type="text/javascript" src="rfunc.js" ></script>
 
     </head>
     
@@ -18,7 +19,14 @@
         <div>
             <svg id="roadpie" width="500" height="500" ></svg>
          </div>
+        <div width="1200" heigh="300">
+            <svg id="rect2" width="1000" height="300"></svg>
+            <svg id="roadname" width="100" height="300"></svg>
+        </div>
          <div id="roseDiv">
+            
+        </div>
+        <div id="AbstractDiv">
             
         </div>
         
@@ -35,20 +43,24 @@
    	    	data = eval('(' + data + ')');
    	   //画事故数量大于num的lh的饼图
    	    	gragh = "road"+"pie";
-
-   	    	var num;
+			
+   	    	var num,num1;
    	    	num = 300;
+   	    	num1=0;
    	    	var dataset = [];
    	    	data.forEach(function(d, i){
    	    	    if(d.count >= num)
    	    	        dataset.push([d.lh, d.count]);
+   	    	    else
+   	    	    	num1+=d.count;
    	    	});
    	    	//小于300的lh归于其他
-   	    	dataset.push(["其他", num]);  
+   	    	//dataset.push(["其他", num1]);  
 
    	    	//饼状图
    	    	drawPie(dataset, gragh, 500, 500);
       	        });
+      	   
         </script>
 
     </body>

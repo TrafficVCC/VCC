@@ -1,8 +1,4 @@
 
-
-
-
-
 function drawPie(data, str, w, h){
     
     var pie = d3.layout.pie()
@@ -22,14 +18,72 @@ function drawPie(data, str, w, h){
                 .outerRadius(outerRadius);  
     var color = d3.scale.category20();  
 
-    var arcs = d3.select("#"+str)
+    var updatearcs = d3.select("#"+str)
                     .selectAll("g")  
-                    .data(piedata)  
-                    .enter()  
-                    .append("g")  
+                    .data(piedata);  
+                
+    var enterarcs= updatearcs.enter(); 
+    var exitarcs = updatearcs.exit();
+    
+    exitarcs.remove();
+    
+    updatearcg = updatearcs.attr("transform","translate(" + (w/2) +","+ (h/2) +")");
+   
+    updatearcg.selectAll("path").attr("fill",function(d,i){  
+        return color(i);  
+    })  
+    .attr("d",function(d){  
+        return arc(d);
+    })
+    .on("click", function(d){
+        
+       
+        $.post("/Demo/BackServer",
+     			 {
+     			"type":"week",   //年份
+     			"starty" :"2006",
+     			"endy" : "2016",
+     			"set" : d.data[0]     //全体
+     	    },
+                 function(data,status){
+     	    
+     	    	data = eval('(' + data + ')');
+                     console.log("数据：" + data + "\n状态：" + status);
+                     d3.select("#roseDiv").append("svg")
+                     .attr("width",500)
+                     .attr("height",500)
+                     .attr("id","r"+d.data[0]);
+                     gragh = "roseYear";
+                     drawRose(data,"r"+d.data[0]);
+        	        });
+        
+        	
+            $.post("/Demo/BackServer",
+             	    {
+        	  			"type":"year",   //年份
+        	  			"starty" :"2006",
+        	  			"endy" : "2016",
+        	  			"set" :d.data[0]     //全体
+          	 	    },
+                    function(data,status){
+          	 	    
+          	 	    	js = eval('(' + data + ')');
+                        console.log("数据：" + js + "\n状态：" + status);
+                        d3.select("#roseDiv").append("svg")
+                        .attr("width",1000)
+                        .attr("height",210)
+                        .attr("id","z"+d.data[0]);
+                        drawLineGraph(js, "z"+d.data[0]);
+           	        });
+                
+             
+        
+    }); 
+    
+    
+    enterarcg = enterarcs.append("g")  
                     .attr("transform","translate(" + (w/2) +","+ (h/2) +")");
-
-    arcs.append("path")  
+    enterarcg.append("path")  
         .attr("fill",function(d,i){  
             return color(i);  
         })  
@@ -37,8 +91,7 @@ function drawPie(data, str, w, h){
             return arc(d);
         })
         .on("click", function(d){
-            alert(d.data[0]);
-            alert(1); 
+           
             $.post("/Demo/BackServer",
          			 {
          			"type":"week",   //年份
@@ -47,7 +100,7 @@ function drawPie(data, str, w, h){
          			"set" : d.data[0]     //全体
          	    },
                      function(data,status){
-         	    	alert(data);
+         	    
          	    	data = eval('(' + data + ')');
                          console.log("数据：" + data + "\n状态：" + status);
                          d3.select("#roseDiv").append("svg")
@@ -76,13 +129,22 @@ function drawPie(data, str, w, h){
                             .attr("id","z"+d.data[0]);
                             drawLineGraph(js, "z"+d.data[0]);
                	        });
+              
+                $.post("/Demo/DataServlet",
+                 	    {
+            	  			"lh" :d.data[0]     //全体
+              	 	    },
+                        function(data,status){
+              	 	    	
+              	 	    	displayRoadInfo(data);
+               	        });
                     
                  
             
         }); 
 
     //添加弧内的文字  
-    arcs.append("text")  
+    enterarcg.append("text")  
         .attr("transform",function(d){  
             var x=arc.centroid(d)[0]*1.4;//文字的x坐标  
             var y=arc.centroid(d)[1]*1.4;  
@@ -97,14 +159,10 @@ function drawPie(data, str, w, h){
     //        //保留一位小数点 末尾加一个百分号返回  
     //        return percent.toFixed(1)+"%";  
             return d.data[1];
-        })
-        .on("click", function(d){
-            alert(d.data[0]);
-            alert(2);
         });  
 
     //添加连接弧外文字的直线元素  
-    arcs.append("line")  
+    enterarcg.append("line")  
         .attr("stroke","black")  
         .attr("x1",function(d){  
             return arc.centroid(d)[0]*2;  
@@ -119,7 +177,7 @@ function drawPie(data, str, w, h){
             return arc.centroid(d)[1]*2.2;  
         });  
     //添加弧外的文字元素  
-    arcs.append("text")  
+    enterarcg.append("text")  
         .attr("transform",function(d){  
             var x=arc.centroid(d)[0]*2.5;  
             var y=arc.centroid(d)[1]*2.5;  
@@ -128,13 +186,88 @@ function drawPie(data, str, w, h){
         .attr("text-anchor","middle")  
         .text(function(d){  
             return d.data[0];  
-        })
-        .on("click", function(d){
-            alert(d.data[0]);
-            alert(3);
-        
-
         }); 
-    
+
 }
 
+function displayRoadInfo(roadnum){
+	
+    var roadName = d3.select("#roadname");
+    js = eval('(' + roadnum + ')');
+    
+    d3.select("#roadname")
+        .selectAll("text")
+        .remove();
+    d3.select("#roadname")
+        .append("text")
+        .text(js[0].lh)
+        .attr('x', 20)
+        .attr('y', 50)
+        .attr("fill", "steelblue");
+    
+    d3.select("#rect2")
+        .selectAll("rect")
+        .remove();
+    d3.select("#rect2")
+        .selectAll("text")
+        .remove();
+    dataset2 = [];
+
+  
+    js.forEach(function(d){
+    	if(d.jdwz!=null)
+    			dataset2.push(d.jdwz);
+    });
+
+    
+ 	
+    d3.select("#rect2")
+        .append("rect")
+        .attr("transform","translate("+ padding.left +","+ padding.top +")")  
+        .attr("width", 1000 - padding.left)
+        .attr("height", 150 - padding.top - padding.bottom -20 )
+        .attr("fill", d3.rgb(100,100,100))
+        .on("click", function(){
+    //        alert("cancle!");
+        });
+    
+    var cmax = getMax(dataset2);
+    var cmin = getMin(dataset2);
+  
+    
+    xScale = d3.scale.linear()
+        .domain([cmin, cmax])
+        //.domain([0, (cmax+10)*1000])
+        .range([0, 1000 - padding.left - padding.right]); 
+
+    
+    d3.select("#rect2")
+        .selectAll("rect")
+        .data(js)
+        .enter()  
+        .append("rect")
+        .attr("transform","translate(" + padding.left +","+ padding.top +")")
+        .attr("x", function(d,i){
+//                return xScale(d[4])+padding.left;
+                return xScale(d.jdwz);
+            })
+        .attr("y",function(d,i){ 
+                return 0;  
+            })  
+        .attr("width", 2)  
+        .attr("height", 150 - padding.top - padding.bottom-20) 
+        .attr("opacity", 0.5)
+        .on("click",function(d)
+        		{
+        			alert(d.jdwz);
+        		})
+        .attr("fill", d3.rgb(255,255,255))
+        .transition()
+        .attr("fill", d3.rgb(255,0,0))
+        .delay(function(d,i){
+            return d.time;
+        });
+        
+      
+    
+}

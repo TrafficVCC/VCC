@@ -20,6 +20,15 @@ public class MysqlUtils {
 	//驱动信息
 	private static final String driver = "com.mysql.jdbc.Driver";
 	
+	//类型到其count数量的映射
+	private static final Map<String, Integer> typeTonum = new HashMap<String, Integer>();
+	static {
+		typeTonum.put("year", 1);
+		typeTonum.put("month", 12);
+		typeTonum.put("quarter", 4);
+		typeTonum.put("week", 7);
+	}
+	
 	private Connection conn;
 	private ResultSet rs;
 	
@@ -89,7 +98,7 @@ public class MysqlUtils {
 	    rs = queryResult(sql);
 	    JSONArray js = resultToJson(rs);
 	    if(!type.equals("lh")) {
-	    	js = combineJSON(js);
+	    	js = combineJSON(js,starty,endy,type);
 	    }
 	    return js;
 	}
@@ -119,21 +128,38 @@ public class MysqlUtils {
 	}
 	
 	
-	/*合并具有相同key值的(相同年份合并到一个count数组中)*/
-	private JSONArray combineJSON(JSONArray array) throws JSONException {
+	/*合并具有相同key值的(相同年份合并到一个count数组中),无记录补0*/
+	private JSONArray combineJSON(JSONArray array,String starty,String endy,String type) 
+			throws JSONException,IndexOutOfBoundsException {
 		JSONArray result = new JSONArray();
 		//注:HashMap内部是无序的,应用LinkedHashMap
 		Map<Object, List> map = new LinkedHashMap<>();
+		int num = typeTonum.get(type);
+		//初始化map,count里根据类型填充0
+		for(int i=Integer.parseInt(starty); i<=Integer.parseInt(endy);i++) {
+			List li = new ArrayList<>();
+			for(int j=0; j<num; j++) {
+				li.add(0);
+			}
+			map.put(i, li);
+		}
+		
 		for(int i=0; i<array.length(); i++) {
 			JSONObject js = array.getJSONObject(i);
-			Object value = js.get("year");
-			if(!map.containsKey(value)) {
-				List newList = new ArrayList<>();
-				newList.add(js.get("count"));
-				map.put(value, newList);
+			Object key = js.get("year");
+			Object index = js.get(type);	//在count中的位置,若是按月查询,则对应第几个月
+//			if(!map.containsKey(key)) {
+//				List newList = new ArrayList<>();
+//				newList.add(js.get("count"));
+//				map.put(key, newList);
+//			}
+			if(type.equals("year"))
+			{
+				map.get(key).set(0,js.get("count"));
 			}
-			else {
-				map.get(value).add(js.get("count"));
+			else
+			{
+				map.get(key).set((int)index-1,js.get("count"));
 			}
 		}
 		
@@ -212,12 +238,7 @@ public class MysqlUtils {
 					 "having year >= " +starty+ " and year <= " +endy+"\n" +
 					 "order by year";
 		
-//		String sql = "SELECT yeart.year year, COUNT(YEAR(ybsg1.sgfssj)) count\n" +
-//					 "FROM yeart\n" +
-//					 "LEFT JOIN ybsg1 ON (YEAR(ybsg1.sgfssj)=yeart.year" +wherelh+ ")\n" +
-//					 "GROUP BY year\n" +
-//					 "having year >= " +starty+ " and year <= " +endy+"\n" +
-//					 "ORDER BY year ";
+		
 		return sql;
 	}
 	
@@ -245,7 +266,7 @@ public class MysqlUtils {
 			wherelh = " and lh = "+set;
 		}
 		
-		String sql = "select YEAR(sgfssj) as year, count(*) as count\n" + 
+		String sql = "select YEAR(sgfssj) as year, xq as week, count(*) as count\n" + 
 					 "from ybsg1\n" + 
 					 "where sgfssj is not null and xq is not null "+ wherelh +"\n" + 
 					 "group by YEAR(sgfssj),xq\n" + 
