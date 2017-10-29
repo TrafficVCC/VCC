@@ -1,2 +1,18 @@
 @CHARSET "UTF-8";
 
+
+#road{
+	width: 100%;
+	float: left;
+}
+
+#pieDiv{
+	float:left;
+}
+#roseDiv{
+	float:left;
+}
+
+.div-inline{ 
+	display:inline
+} 

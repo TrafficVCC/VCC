@@ -16,20 +16,19 @@
     
     <body>
       
-        <div>
-            <svg id="roadpie" width="500" height="500" ></svg>
-         </div>
-        <div width="1200" heigh="300">
-            <svg id="rect2" width="1000" height="300"></svg>
-            <svg id="roadname" width="100" height="300"></svg>
-        </div>
-         <div id="roseDiv">
-            
-        </div>
-        <div id="AbstractDiv">
-            
-        </div>
-        
+        <div id="road">
+        	<div id="pieDiv" style="float: left;"   class="div-inline" >
+        		<svg id="roadpie" width="400" height="400" ></svg>
+        	</div>
+            <div id="roseDiv" style="float: left;"  class="div-inline" ></div>
+        	<div id="lineDiv" width="1000" height="210" class="div-inline" ></div>
+         	<div>
+            	<svg id="rect2" width="1000" height="300"></svg>
+            	<svg id="roadname" width="100" height="300"></svg>
+        	</div>
+        	
+       </div>
+       
         
         <script type="text/javascript">
         $.post("/Demo/BackServer",
@@ -43,7 +42,7 @@
    	    	data = eval('(' + data + ')');
    	   //画事故数量大于num的lh的饼图
    	    	gragh = "road"+"pie";
-			
+		
    	    	var num,num1;
    	    	num = 300;
    	    	num1=0;
@@ -58,7 +57,7 @@
    	    	//dataset.push(["其他", num1]);  
 
    	    	//饼状图
-   	    	drawPie(dataset, gragh, 500, 500);
+   	    	drawPie(dataset, gragh, 400, 400);
       	        });
       	   
         </script>

@@ -30,7 +30,6 @@ function getMin(a){
 
 
 function drawRose(data, str){
-    
     var dataset = [];
     var maxs = [];
     var mins = [];
@@ -72,7 +71,7 @@ function drawRose(data, str){
         }
 //        console.log(piedata);
         //画圈圈
-        drawCircle(str, piedata,j,max,min);
+        drawCircle(str, piedata,j,max,min, dataset.length);
         
     }
         //画两直线
@@ -129,7 +128,7 @@ function drawRose(data, str){
 //function markNum()
 
 
-function drawCircle(str, piedata, j, max, min){
+function drawCircle(str, piedata, j, max, min, a){
     //color
     var linear = d3.scale.linear()  
                 .domain([min,max])  
@@ -137,8 +136,8 @@ function drawCircle(str, piedata, j, max, min){
     var compute = d3.interpolate(color1,color2);  
     
     //内外径
-    var outerRadius = [(h/3)/11]*(j+1)+j;  
-    var innerRadius = (h/3)/11*j+j;
+    var outerRadius = [(h/3)/a]*(j+1)+j;  
+    var innerRadius = [(h/3)/a]*j+j;
     
     var arc = d3.svg.arc()  
                 .innerRadius(innerRadius)  

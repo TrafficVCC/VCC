@@ -5,7 +5,7 @@ var sday;
 var graph="";
 
 var width = 1000;
-var hight = 210;
+var hight =160;
     
 var padding = {top:30, right:50, bottom: 30, left:50 };
 
@@ -134,7 +134,9 @@ function drawLineGraphByYear()
   	 	    	js = eval('(' + data + ')');
                 console.log("数据：" + js + "\n状态：" + status);
                 gragh = "c"+"year";
-                drawLineGraph(js, gragh);
+                drawLineByYear(js, gragh, function (d){
+                	alert(1);
+                });
    	        });
         
      

@@ -40,7 +40,7 @@ function drawPie(data, str, w, h){
        
         $.post("/Demo/BackServer",
      			 {
-     			"type":"week",   //年份
+     			"type":"week",   //星期
      			"starty" :"2006",
      			"endy" : "2016",
      			"set" : d.data[0]     //全体
@@ -49,12 +49,14 @@ function drawPie(data, str, w, h){
      	    
      	    	data = eval('(' + data + ')');
                      console.log("数据：" + data + "\n状态：" + status);
+                   	d3.select("#roadweek")
+                   		.remove();
                      d3.select("#roseDiv").append("svg")
-                     .attr("width",500)
-                     .attr("height",500)
-                     .attr("id","r"+d.data[0]);
-                     gragh = "roseYear";
-                     drawRose(data,"r"+d.data[0]);
+                     .attr("width",300)
+                     .attr("height",300)
+                     .attr("id","roadweek");
+                         gragh = "roseYear";
+                         drawRose(data,"roadweek");
         	        });
         
         	
@@ -69,12 +71,14 @@ function drawPie(data, str, w, h){
           	 	    
           	 	    	js = eval('(' + data + ')');
                         console.log("数据：" + js + "\n状态：" + status);
-                        d3.select("#roseDiv").append("svg")
-                        .attr("width",1000)
-                        .attr("height",210)
-                        .attr("id","z"+d.data[0]);
-                        drawLineGraph(js, "z"+d.data[0]);
-           	        });
+                       	d3.select("#roadyear")
+	                   		.remove();
+	                    d3.select("#lineDiv").append("svg")
+	                   		.attr("width",1000)
+	                   		.attr("height",210)
+	                   		.attr("id","roadyear");
+						drawLineGraph(js, "roadyear");
+          	 	    });
                 
              
         
@@ -102,14 +106,16 @@ function drawPie(data, str, w, h){
                      function(data,status){
          	    
          	    	data = eval('(' + data + ')');
-                         console.log("数据：" + data + "\n状态：" + status);
-                         d3.select("#roseDiv").append("svg")
-                         .attr("width",500)
-                         .attr("height",500)
-                         .attr("id","r"+d.data[0]);
-                         gragh = "roseYear";
-                         drawRose(data,"r"+d.data[0]);
-            	        });
+                    console.log("数据：" + data + "\n状态：" + status);
+                   	d3.select("#roadweek")
+               			.remove();
+                   	d3.select("#roseDiv").append("svg")
+                   		.attr("width",400)
+                   		.attr("height",400)
+                   		.attr("id","roadweek");
+                   		gragh = "roseYear";
+                   		drawRose(data,"roadweek");
+         	    });
             
             	
                 $.post("/Demo/BackServer",
@@ -123,11 +129,13 @@ function drawPie(data, str, w, h){
               	 	    
               	 	    	js = eval('(' + data + ')');
                             console.log("数据：" + js + "\n状态：" + status);
-                            d3.select("#roseDiv").append("svg")
-                            .attr("width",1000)
-                            .attr("height",210)
-                            .attr("id","z"+d.data[0]);
-                            drawLineGraph(js, "z"+d.data[0]);
+                           	d3.select("#roadyear")
+                           		.remove();
+                            d3.select("#lineDiv").append("svg")
+	                       		.attr("width",1000)
+	                       		.attr("height",210)
+	                       		.attr("id","roadyear");
+							drawLineGraph(js, "roadyear");
                	        });
               
                 $.post("/Demo/DataServlet",
@@ -152,12 +160,6 @@ function drawPie(data, str, w, h){
         })  
         .attr("text-anchor","middle")  
         .text(function(d){  
-            //计算市场份额的百分比  
-    //        var percent=Number(d.value)/d3.sum(data,function(d){  
-    //            return d[1];  
-    //        })*100;  
-    //        //保留一位小数点 末尾加一个百分号返回  
-    //        return percent.toFixed(1)+"%";  
             return d.data[1];
         });  
 
@@ -202,8 +204,8 @@ function displayRoadInfo(roadnum){
         .append("text")
         .text(js[0].lh)
         .attr('x', 20)
-        .attr('y', 50)
-        .attr("fill", "steelblue");
+        .attr('y', 70)
+        .attr("fill", "black");
     
     d3.select("#rect2")
         .selectAll("rect")
@@ -235,7 +237,7 @@ function displayRoadInfo(roadnum){
     var cmin = getMin(dataset2);
   
     
-    xScale = d3.scale.linear()
+    roadScale = d3.scale.linear()
         .domain([cmin, cmax])
         //.domain([0, (cmax+10)*1000])
         .range([0, 1000 - padding.left - padding.right]); 
@@ -249,7 +251,7 @@ function displayRoadInfo(roadnum){
         .attr("transform","translate(" + padding.left +","+ padding.top +")")
         .attr("x", function(d,i){
 //                return xScale(d[4])+padding.left;
-                return xScale(d.jdwz);
+                return roadScale(d.jdwz);
             })
         .attr("y",function(d,i){ 
                 return 0;  

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="js/d3.min.js" ></script>
+<script type="text/javascript">
+	var indate = [1,2,3,4]; 
+	
+	function draw(outdate,fun)
+	{
+		var testdate = outdate;
+		var update =d3.select("#test").selectAll("p").data(testdate);
+		var exit = update.exit();
+		var enter = update.enter();
+	
+		update.text(function(d){
+			return d;
+		});
+		enter.append("p").text(function(d){
+			return d;
+		})
+		.on("click",function(d){
+			fun(d)
+		});
+		exit.remove();
+	}
+	function Hello (d) {
+			alert(d);
+		}
+</script>
+</head>
+<body>
+<div id="test">
+
+</div>
+<script type="text/javascript">
+
+draw(indate,Hello);
+		
+		
+		
+</script>
+</body>
+</html>
