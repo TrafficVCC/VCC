@@ -122,7 +122,7 @@ function drawBack(str){
 function drawLineGraphByYear()
 {
 	
-    $.post("/Demo/BackServer",
+    $.post("/Demo/TimeServlet",
      	    {
 	  			"type":"year",   //年份
 	  			"starty" :"2006",
@@ -179,7 +179,7 @@ function setClick(str){
     .selectAll("circle")
     .on("click", function(d){
     	syear = d[0];
-    	 $.post("/Demo/BackServer",
+    	 $.post("/Demo/TimeServlet",
     	     	    {
     		  			"type":"month",   //年份
     		  			"starty" :syear,

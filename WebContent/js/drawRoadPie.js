@@ -1,6 +1,8 @@
-//data: lh和数量的json字符串。格式为[{"lh":"XXX","count":d},{…，…}，……]
+//data: lh和数量的json字符串。
+//结构：[{"lh":"XXX","count":d},{…，…}，……]
 //svgId：画布id的字符串
 //func：点击扇形可触发的函数。
+//func(d). d中可用属性：d.data[0]:路号, d.data[1]:事故数量, d.value:事故数量.
 
 //画关于道路发生事故数量的信息的饼图
 function drawRoadPie(data, svgId, func){
@@ -25,7 +27,6 @@ function drawRoadPie(data, svgId, func){
 				            return d[1]; 
 				        });
     var piedata = pie(dataset);
-//  console.log(piedata);
     
     //内外径
     var outerRadius = (height - (padding*2))/3 ; 
@@ -35,15 +36,18 @@ function drawRoadPie(data, svgId, func){
             	.innerRadius(innerRadius)  
                 .outerRadius(outerRadius);  
     
+    //绑定画布
     var s = d3.select("#"+svgId);
     
+    s.selectAll("g")
+		.remove();
     //添加群组
     var g = s.selectAll("g");
     var updateG = g.data(piedata);
     var enterG= updateG.enter(); 
     var exitG = updateG.exit();
-    exitG.remove();
-    
+//  exitG.remove();
+
     //画扇形
     var updateArc = updateG.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
     updateArc.selectAll("path")
@@ -58,7 +62,7 @@ function drawRoadPie(data, svgId, func){
 	    });
 	
 	var enterArc = enterG.append("g")
-						.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
+					.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
 	enterArc.append("path")
 		.attr("fill",function(d,i){
 	        return color(i);  
@@ -108,8 +112,4 @@ function drawRoadPie(data, svgId, func){
             return d.data[0];  
         }); 
 
-
-    
-    
-	
 }

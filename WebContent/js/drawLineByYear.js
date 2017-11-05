@@ -1,6 +1,8 @@
-//data：一个数组。许多二维数组的集合。结构为[{"year":d, "count":[d]}, {…, …}, …… ].
+//data：一个数组。许多二维数组的集合。
+//结构为[{"year":d, "count":[d]}, …… ].
 //svgId：字符串。画图位置所在的svg的id。
 //func：函数名。点击折线点能触发的函数。
+//func(d),d[0]:年份,d[1]:事故数量。
 
 //画年代折线图
 function drawLineByYear(data, svgId, func){
@@ -42,7 +44,7 @@ function drawLineByYear(data, svgId, func){
             return yScale(d[1]) + padding.top;
         });
         
-	var l = s.selectAll("path");
+	var l = s.selectAll("path.line");
     var updateLines = l.data(dataset);
     var enterLines = updateLines.enter();
     var exitLines = updateLines.exit();
@@ -53,13 +55,36 @@ function drawLineByYear(data, svgId, func){
         .attr("fill", "none");
         
 	enterLines.append("path")
+		.attr("class", "line")
         .attr("d",linePath(dataset))
         .attr("stroke", d3.rgb(62,82,91))
-        .attr("stroke-width", height/70)
+        .attr("stroke-width", height/100)
         .attr("fill", "none");
         
     exitLines.remove();
   
+  	//画横纵坐标
+	s.selectAll("g")
+		.remove();
+		
+    var x_axis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom")
+                    .ticks(dataset.length-1);
+    var y_axis = d3.svg.axis()
+                    .scale(yScale)
+                    .orient("left")
+                    .ticks(3);
+    
+	s.append("g")
+		.attr("class", "xaxis")
+        .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
+        .call(x_axis);
+	s.append("g")
+		.attr("class", "yaxis")
+		.attr("transform", "translate("+ padding.left +"," + padding.top + ")")
+		.call(y_axis);
+
                    
 	//画点
 	var p = s.selectAll("circle");
@@ -104,33 +129,6 @@ function drawLineByYear(data, svgId, func){
         
 	exitPoints.remove();
 		    
-    //画横纵坐标
-	 s.selectAll("g.xaxis")
-		.remove();
-		
-    var x_axis = d3.svg.axis()
-                    .scale(xScale)
-                    .orient("bottom")
-                    .ticks(dataset.length-1);
-    var y_axis = d3.svg.axis()
-                    .scale(yScale)
-                    .orient("left")
-                    .ticks(3);
-    
-	s.append("g")
-		.attr("class", "xaxis")  //设定坐标轴样式
-        .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
-        .call(x_axis);
-//      .append("text") //添加坐标轴说明  
-//      .text("年份")  
-//      .attr("transform","translate("+(padding.bottom)+","+0 +")");
-	s.append("g")
-		.attr("class", "yaxis")
-		.attr("transform", "translate("+ padding.left +"," + padding.top + ")")
-		.call(y_axis);
 
-    
-
-	
 
 }

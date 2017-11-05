@@ -225,7 +225,7 @@ function markType(t,str){
 
 function drawRoseGraphByYear()
 {
-	$.post("/Demo/BackServer",
+	$.post("/Demo/TimeServlet",
 			 {
 			"type":"quarter",   //年份
 			"starty" :"2006",
@@ -241,7 +241,7 @@ function drawRoseGraphByYear()
 }
 function drawRoseGraphByMonth()
 {
-	$.post("/Demo/BackServer",
+	$.post("/Demo/TimeServlet",
 			 {
 			"type":"month",   //年份
 			"starty" :"2006",
@@ -257,7 +257,7 @@ function drawRoseGraphByMonth()
 }
 function drawRoseGraphByWeek()
 {
-	$.post("/Demo/BackServer",
+	$.post("/Demo/TimeServlet",
 			 {
 			"type":"week",   //年份
 			"starty" :"2006",
