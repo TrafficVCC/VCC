@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.TimeMapper">
+
+    <select id="yearQuery" parameterType="hashmap" resultType="hashmap">
+        select YEAR(sgfssj) as year , count(*) as count
+		from ybsg1 
+		where sgfssj is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year 
+        <![CDATA[ having year >= #{starty} and year <= #{endy} ]]>  
+        order by year
+    </select>	
+    
+     <select id="monthQuery" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year , MONTH(sgfssj) as month, count(*) as count
+		from ybsg1 
+		where sgfssj is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year,month
+        <![CDATA[ having year >= #{starty} and year <= #{endy} ]]>  
+        order by year
+     </select>
+     
+     <select id="weekQuery" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year , xq as week, count(*) as count
+		from ybsg1 
+		where sgfssj is not null and xq is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year,xq
+        <![CDATA[ having year >= #{starty} and year <= #{endy} ]]>  
+        order by year
+     </select>
+     
+      <select id="week2Query" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year, week(sgfssj,1) as week2, count(*) as count
+		from ybsg1
+		where sgfssj is not null 
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year, week2 
+		<![CDATA[ having year >= #{starty} and year <= #{endy} and week2 > 0 ]]>
+		order by year
+     </select>
+     
+     <select id="quarterQuery" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year , QUARTER(sgfssj) as quarter, count(*) as count
+		from ybsg1 
+		where sgfssj is not null and xq is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year,QUARTER(sgfssj)
+        <![CDATA[ having year >= #{starty} and year <= #{endy} ]]>  
+        order by year
+     </select>
+     
+     <select id="dayQuery" parameterType="hashmap" resultType="hashmap">
+     	select DAY(sgfssj) as day, count(*) as count
+     	from ybsg1
+     	where sgfssj is not null and YEAR(sgfssj) = #{year}
+     	<if test='month!="0"'>
+			and MONTH(sgfssj) = #{month}
+		</if>
+     	group by day
+     	order by day
+     </select>
+     
+     <select id="dayQueryByYear" parameterType="hashmap" resultType="hashmap">
+     	select DATE(sgfssj) as date, count(*) as count
+     	from ybsg1
+     	where sgfssj is not null and YEAR(sgfssj) = #{year}
+        <if test='month!="0"'>
+			and MONTH(sgfssj) = #{month}
+		</if>
+     	group by date
+     	order by date
+     </select>
+    
+</mapper>
