@@ -1,5 +1,5 @@
 //data:关于某条道路上发生事件和事件发生间隔的数据集。
-//结构为:[{"id":xx, "diff":xx},……]
+//结构为:[{"no":xx, "span":xx},……]
 //svgId:画布id。
 //func:点击散点能触发的函数。
 //func(d). d[0]:事件, d[1]:与上此发生事件间隔时间。
@@ -7,7 +7,7 @@
 function drawScatters(data, svgId, func){
 	var dataset = [];
 	data.forEach(function(d){
-		dataset.push([d.id,d.diff]);
+		dataset.push([d.no,d.span]);
 	});
 	console.log(dataset);
 	

@@ -107,6 +107,34 @@ function drawLineByYear(data, svgId, func){
         .attr("fill", d3.rgb(62,82,91) )
         .on("click",function(d){
         	func(d)
+        })
+        .on("mouseover", function(d){
+	        d3.select(this)
+	            .transition()
+	            .duration(300)
+	            .attr('r',  function(d) {  
+	                return Math.sqrt(height/5);  
+	            });
+	    
+	        s.append("text")
+	            .attr("id", "text")
+	            .text(d[1])
+	            .attr("x", function(){
+	                return xScale(d[0]) +padding.left +10;
+	            })
+	            .attr("y", function() {
+	                return yScale(d[1]) +padding.top +10;
+	            })
+	            .attr("fill", d3.rgb(62,82,91));
+
+        })
+        .on("mouseout", function(d){
+        	d3.select(this)
+        		.attr('r', function(d) {  
+		            return Math.sqrt(height/7);  
+		        });
+	        d3.select("#text")
+	            .remove();
         });
             
     enterPoints.append("circle")
@@ -125,6 +153,36 @@ function drawLineByYear(data, svgId, func){
         .attr("fill", d3.rgb(62,82,91) )
         .on("click",function(d){
         	func(d)
+        })
+        .on("mouseover", function(d){
+	        d3.select(this)
+	            .transition()
+	            .duration(300)
+	            .attr('r',  function(d) {  
+	                return Math.sqrt(height/5);  
+	            });
+	    
+	        s.append("text")
+	            .attr("id", "text")
+	            .text(d[1])
+	            .transition()
+	            .duration(500)
+	            .attr("x", function(){
+	                return xScale(d[0]) +padding.left -10;
+	            })
+	            .attr("y", function() {
+	                return yScale(d[1]) +padding.top -10;
+	            })
+	            .attr("fill", d3.rgb(62,82,91));
+
+        })
+        .on("mouseout", function(d){
+        	d3.select(this)
+        		.attr('r', function(d) {  
+		            return Math.sqrt(height/7);  
+		        });
+	        d3.select("#text")
+	            .remove();
         });
         
 	exitPoints.remove();

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>RoadMap</title>
+		<!--加载百度地图API库-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	<!--加载鼠标绘制工具-->
+		<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+		<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+    	
+    	<script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+    	
+    	<style type="text/css">
+    		html{height: 100%;}
+    		body{height: 100%; margin: 0px; padding: 0px;}
+    		#display{height: 90%; width: 20%; float: left;}
+    		#map{height: 100%; width: 80%; float: left;}
+    		#btn {display:block;bottom:0px;right:1px;right:18px;width:200px;line-height:30px;position:fixed;border:1px solid #fff;text-align:center;color:#fff;}
+    		/*去除地图左下方baidu logo*/
+    		.BMap_cpyCtrl {display: none;}
+        	.anchorBL {display: none;}
+    	</style>
+	</head>
+	
+	<body>
+		<div id="map"></div>
+		
+		<div id="display" style="overflow: auto;">
+			<!-- padding-left设置p元素左内边距，相当于将里面的元素向右移动 -->
+			<p style="padding-left: 20px;">
+				路名：<input type="text" name="road" />
+			</p>
+			<p style="padding-left: 10px;">
+				<ol id="list"></ol>
+			</p>
+		</div>
+		
+		<div id="btn">
+			<button type="button" onClick="onOpen()">开启拾取</button>
+			<button type="button" onClick="onSubmit()">提交</button>
+		</div>
+	</body>
+	
+	<script type="text/javascript">
+		//定义json数组存储道路数据
+		var road = {"way":"", "data":[]};
+		var ld = 0;	
+		var flag = false;
+		
+		//创建地图
+		var map = new BMap.Map("map", {enableMapClick:false});
+		map.centerAndZoom("合肥",15);
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		
+		var styleOptions = {
+        	strokeColor:"red",    //边线颜色。
+        	fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+        	strokeWeight: 5,       //边线的宽度，以像素为单位。
+        	strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+        	fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+        	strokeStyle: 'solid', //边线的样式，solid或dashed。
+        	enableEditing: true
+    	}
+		
+		var myDrawingManagerObject = new BMapLib.DrawingManager(map, {
+			isOpen: false,
+    		enableDrawingTool: true,
+    		enableCalculate: false,
+    		drawingToolOptions: {
+        		anchor: BMAP_ANCHOR_TOP_LEFT,
+        		offset: new BMap.Size(5, 5),
+       			drawingModes : [
+            		BMAP_DRAWING_POLYLINE,
+            		BMAP_DRAWING_MARKER
+         		]
+    		},
+   			polylineOptions: styleOptions
+    	});
+    	
+    	myDrawingManagerObject.addEventListener("polylinecomplete", function(e,overlay) {
+    		console.log(overlay.getPath());
+    		var obj = {"ld":ld, "points":overlay.getPath()};
+    		road.data.push(obj);
+    		ld = ld + 1;
+    	});
+		
+		map.addEventListener("click",function(e){
+			if(flag) {
+				//console.log(e.point.lng + "," + e.point.lat);
+				var li = "<li>("+e.point.lng+" , "+e.point.lat+")</li>";
+				$("#list").append(li);
+			}
+		});
+		
+		map.addEventListener("rightclick",function(e) {
+			flag = false;
+		});
+		
+		function onOpen () {
+			flag = true;
+			//setTimeout(draw, 1000);
+		}
+		
+		function onSubmit () {
+			var name = $("input:text").val();
+			if(name=="") {
+				alert("请输入路名");
+				return;
+			}
+			road.way = name;
+			alert(road.way);
+			console.log(road);
+			$.post("/Demo/MapServlet",
+				{
+					"road": JSON.stringify(road)
+				},
+				function(data, status) {
+					alert(status);
+				}
+			);
+		}
+	</script>
+</html>
