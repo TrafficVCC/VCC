@@ -2,7 +2,11 @@
 
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-		
+	<!-- mybatis别名定义 -->
+    <typeAliases> 
+        <typeAlias alias="RoadNet" type="hfut.vcc.mapping.RoadNet"/> 
+    </typeAliases> 
+	
    <environments default = "development">
       <environment id = "development">
          <transactionManager type = "JDBC"/> 
@@ -20,6 +24,7 @@
    <mappers>
    	  <mapper class = "hfut.vcc.mapping.TimeMapper"/>
    	  <mapper class = "hfut.vcc.mapping.RoadMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.RoadNetMapper"/>
    </mappers>
    
 </configuration>

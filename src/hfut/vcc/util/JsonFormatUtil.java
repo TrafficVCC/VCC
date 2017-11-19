@@ -1,4 +1,4 @@
-package hfut.vcc.utils;
+package hfut.vcc.util;
 
 /** 
  * 该类提供格式化JSON字符串的方法。 
