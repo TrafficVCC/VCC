@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>分析系统</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="format-detection" content="telephone=no">
+  
+	<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+	<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+	
+	<script type="text/javascript" src="js/drawLineByYear.js" ></script>
+	<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
+	<script type="text/javascript" src="js/drawRoadPie.js" ></script>
+	<script type="text/javascript" src="js/drawCalendar.js" ></script>
+	<script type="text/javascript" src="js/drawYearCal.js" ></script>
+	<script type="text/javascript" src="js/drawScatters.js" ></script>
+	<script type="text/javascript" src="datas.js" ></script>
+	<script type="text/javascript" src="read.js" ></script>
+	<script type="text/javascript" src="src/showTimeAnalyze.js" ></script>
+	<script type="text/javascript" src="src/showSpaceAnalyze.js" ></script>
+	<script type="text/javascript" src="js/showDataAnalyze.js" ></script>
+	<script type="text/javascript" src="js/showRoadAnalyze.js" ></script>
+	
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    
+	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+  
+	<link rel="stylesheet" href="./layui/css/layui.css"  media="all">
+	<link rel="stylesheet" href="css/content.css" >
+	
+	<style type="text/css">
+    		#display{height: 90%; width: 20%; float: left;}
+    		#map{height: 100%; width: 80%; float: left;}
+    		#btn {display:block;bottom:0px;right:1px;right:18px;width:200px;line-height:30px;position:fixed;border:1px solid #fff;text-align:center;color:#fff;}
+    		/*去除地图左下方baidu logo*/
+    		.BMap_cpyCtrl {display: none;}
+        	.anchorBL {display: none;}
+    </style>
+	
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">交通事故分析</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item"><a href="index.html">数据分析</a></li>
+      <li class="layui-nav-item"><a href="mapTool.html">道路提取</a></li>
+    </ul>
+    
+  </div>
+  
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      
+    </div>
+  </div>
+  
+  <div class="layui-body" >
+    <!-- 内容主体区域 -->
+    <div id="map"></div>
+    <div id="display" style="overflow: auto;">
+		<!-- padding-left设置p元素左内边距，相当于将里面的元素向右移动 -->
+		<p style="margin:10px 5px 15px 20px;">
+			<input type="text" name="title" required  lay-verify="required" placeholder="请输入路名" autocomplete="off" class="layui-input">
+		</p>
+		<p style="">
+			<ol id="list" style="padding-left: 20px"></ol>
+		</p>
+	</div>
+	<div id="btn" class="layui-btn-group">
+		<button class="layui-btn" onClick="onOpen()">拾取</button>
+		<button class="layui-btn" onClick="onDist()">测距</button>
+		<button class="layui-btn" onClick="onSubmit()">提交</button>
+	</div>
+  </div>
+  
+  
+  <div class="layui-footer">
+
+  </div>
+</div>
+<script src="js/layui.all.js" charset="utf-8"></script>
+
+<script type="text/javascript">
+//定义json数组存储道路数据
+var road = {"way":"", "data":[]};
+var flag = false;
+var overlays = [];
+var m = new Map();	//polyline和ld的映射关系
+var ld = 0;
+
+//创建地图
+var map = new BMap.Map("map", {enableMapClick:false});
+map.centerAndZoom("合肥",15);
+map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+var polylineMenuItem = [
+	{
+		text:'编辑',
+		callback:function(e,ee,overlay){overlay.enableEditing();}
+	},
+	{
+		text:'完成',
+		callback:function(e,ee,overlay){
+			overlay.disableEditing();
+		}
+	},
+	{
+		text:'删除',
+		callback:function(e,ee,overlay){
+			var index = m.get(overlay);
+			//alert(index);
+			map.removeOverlay(overlay);
+			overlays.splice(index,1);	//删除overlays中指定索引项
+		}
+	}
+];
+
+var styleOptions = {
+	strokeColor:"red",    //边线颜色。
+	fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+	strokeWeight: 6,       //边线的宽度，以像素为单位。
+	strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+	fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+	strokeStyle: 'solid', //边线的样式，solid或dashed。
+	enableEditing: false
+}
+
+//创建鼠标绘制工具
+var myDrawingManagerObject = new BMapLib.DrawingManager(map, {
+	isOpen: false,
+	enableDrawingTool: true,
+	enableCalculate: false,
+	drawingToolOptions: {
+		anchor: BMAP_ANCHOR_TOP_LEFT,
+		offset: new BMap.Size(5, 5),
+		drawingModes : [
+			BMAP_DRAWING_POLYLINE,
+			BMAP_DRAWING_MARKER
+		]
+	},
+	polylineOptions: styleOptions
+});
+
+//绘制polyline完成后，派发的事件接口
+myDrawingManagerObject.addEventListener("polylinecomplete", function(e,overlay) {
+    overlays.push(overlay);
+	overlay.setStrokeColor("blue");
+	m.set(overlay,ld);
+	ld = ld + 1;
+	addPolylineEvent(overlay);
+});
+
+//polyline鼠标右击事件,弹出菜单项
+function addPolylineEvent(overlay) {
+	overlay.addEventListener("rightclick", function (e) {
+		var polylineMenu = new BMap.ContextMenu();
+		for(var i=0; i < polylineMenuItem.length; i++){
+			polylineMenu.addItem(new BMap.MenuItem(polylineMenuItem[i].text,polylineMenuItem[i].callback.bind(overlay)));
+		}
+		overlay.addContextMenu(polylineMenu);
+	});
+}
+
+map.addEventListener("click",function(e){
+	if(flag) {
+		//console.log(e.point.lng + "," + e.point.lat);
+		var li = "<li>("+e.point.lng+" , "+e.point.lat+")</li>";
+		$("#list").append(li);
+	}
+});
+
+map.addEventListener("rightclick",function(e) {
+	flag = false;
+});
+
+function onOpen () {
+	flag = true;
+	var name = $("input:text").val();
+	if(name!="") {
+		// 创建地址解析器实例
+		var myGeo = new BMap.Geocoder();
+		// 将地址解析结果显示在地图上,并调整地图视野
+		myGeo.getPoint(name, function(point){
+			if (point) {
+				map.centerAndZoom(point, 16);
+				//map.addOverlay(new BMap.Marker(point));
+			}else{
+				alert("您选择地址没有解析到结果!");
+			}
+		}, "合肥市");
+	}
+}
+
+function onDist() {
+	//添加百度地图测距功能
+	var opts = {lineColor:"blue",lineStroke :5, opacity:0.8};
+	var myDis = new BMapLib.DistanceTool(map,opts);
+	myDis.open();
+}
+
+function onSubmit () {
+	var name = $("input:text").val();
+	if(name=="") {
+		alert("请输入路名");
+		return;
+	}
+	road.way = name;
+	alert(road.way);
+	for(var ld=0; ld<overlays.length; ld++) {
+		var obj = {"ld":ld, "points":overlays[ld].getPath()};
+		road.data.push(obj);
+	}
+	
+	//设置距离
+	var start = new BMap.Point(road.data[0].points[0].lng, road.data[0].points[0].lat);	//保存起点坐标
+	
+	for(var ld=0; ld<overlays.length; ld++) {
+		var points = road.data[ld].points;
+		for(var i=0; i<points.length; i++) {
+			var point = new BMap.Point(points[i].lng, points[i].lat);
+			points[i].dist = map.getDistance(point,start).toFixed(2);
+		}
+	}
+
+	console.log(road);
+
+	$.post("/Demo/MapServlet",
+		{
+			"data": JSON.stringify(road)
+		},
+		function(data, status) {
+			alert(status);
+		}
+	);
+}		
+</script>
+
+</body>
+</html>

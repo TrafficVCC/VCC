@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>read road</title>
+    <!--加载百度地图API库-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    <!--加载鼠标绘制工具-->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+
+    <script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+    <link rel="stylesheet" href="./layui/css/layui.css"  media="all">
+
+    <style type="text/css">
+        html{height: 100%;}
+        body{height: 100%; margin: 0px; padding: 0px;}
+        #display{height: 90%; width: 20%; float: left;}
+        #map{height: 100%; width: 80%; float: left;}
+        #btn {display:block;bottom:0px;right:1px;right:18px;width:200px;line-height:30px;position:fixed;border:1px solid #fff;text-align:center;color:#fff;}
+        /*去除地图左下方baidu logo*/
+        .BMap_cpyCtrl {display: none;}
+        .anchorBL {display: none;}
+    </style>
+</head>
+
+<body>
+<div id="map"></div>
+
+<div id="display" class="layui-form">
+    <div class="layui-input-block" style="margin:10px 10px 15px 20px;">
+        <select id="roadname">
+            <option value="">请选择道路</option>
+            <option value="0">黄山路</option>
+            <option value="1">金寨路</option>
+            <option value="2">宁国路</option>
+            <option value="3">翡翠路</option>
+            <option value="4">繁华大道</option>
+        </select>
+    </div>
+</div>
+
+<div id="btn" class="layui-btn-group">
+    <button class="layui-btn" onclick="onRead();">载入道路</button>
+</div>
+</body>
+
+<script src="./layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use('form', function(){
+        var form = layui.form;
+
+        //各种基于事件的操作，下面会有进一步介绍
+    });
+
+    //创建地图
+    var map = new BMap.Map("map", {enableMapClick:false});
+    map.centerAndZoom("合肥",15);
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+    function onRead() {
+        var options=$("#roadname option:selected");  //获取选中的项
+        alert(options.text());
+        
+     	// 创建地址解析器实例
+		var myGeo = new BMap.Geocoder();
+		// 将地址解析结果显示在地图上,并调整地图视野
+		myGeo.getPoint(options.text(), function(point){
+			if (point) {
+				map.centerAndZoom(point, 16);
+				//map.addOverlay(new BMap.Marker(point));
+			}else{
+				alert("您选择地址没有解析到结果!");
+			}
+		}, "合肥市");	
+
+        $.post("/Demo/LoadRoadServlet",
+                {
+                    "data": options.text()
+                },
+                function(data, status) {
+                    //alert(status);
+                    data = eval('(' + data + ')');
+                    //alert(data);
+                    drawPolyline(data);
+                }
+        );
+    }
+
+    function drawPolyline(data) {
+    	var overlays = [];
+        var points = [];
+        var ld = 0;
+        for(var i=0; i<data.length; i++) {
+        	if(data[i].ld == ld) {
+        		var p = new BMap.Point(data[i].lng, data[i].lat);
+                points.push(p);	
+        	}
+        	else {
+        		overlays.push(points);
+        		points = [];
+        		var p = new BMap.Point(data[i].lng, data[i].lat);
+                points.push(p);
+        		ld = ld + 1;
+        	}
+        }
+        overlays.push(points);
+        console.log(overlays)
+
+        var styleOptions = {
+            strokeColor:"red",    //边线颜色。
+            fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+            strokeWeight: 6,       //边线的宽度，以像素为单位。
+            strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+            fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+            strokeStyle: 'solid', //边线的样式，solid或dashed。
+            enableEditing: false
+        }
+        for(var i=0; i<overlays.length; i++) {
+        	var polyline = new BMap.Polyline(overlays[i], styleOptions)
+            map.addOverlay(polyline);	
+        }
+    }
+
+</script>
+</html>
