@@ -35,6 +35,9 @@ function drawRoadPie(data, svgId, func){
     var arc = d3.svg.arc()  
             	.innerRadius(innerRadius)  
                 .outerRadius(outerRadius);  
+    var arc1= d3.svg.arc()
+    			.innerRadius(innerRadius)  
+                .outerRadius(outerRadius*1.1);  
     
     //绑定画布
     var s = d3.select("#"+svgId);
@@ -58,7 +61,32 @@ function drawRoadPie(data, svgId, func){
 	        return arc(d);
 	    })
 	    .on("click", function(d){
-	    	func(d);
+	    	
+	    	updateArc.selectAll("path")
+	    		.transition()
+				.ease('bounce') 
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc(d);
+	   			});
+	   		s=d3.selectAll(".label")
+	   			.attr("fill", "none");
+	    	
+	    	var num = d.data[0].toString();
+	    	d3.select(this)
+	    		.transition()
+				.ease('bounce') 
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc1(d);
+	   			});
+	   		d3.select("#lh"+num)
+//				.transition()
+//				.duration(1000)
+				.attr("fill", "black");
+	   			
+	   		
+	   		func(d);
 	    });
 	
 	var enterArc = enterG.append("g")
@@ -70,12 +98,67 @@ function drawRoadPie(data, svgId, func){
 	    .attr("d",function(d){  
 	        return arc(d);
 	    })
+	    .on("mouseover", function(d){
+	    	var num = d.data[0].toString();
+	    	d3.select(this)
+	    		.transition()
+	    		.ease('bounce') 
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc1(d);
+	   			});
+
+			d3.select("#lh"+num)
+				.transition()
+				.duration(1000)
+				.attr("fill", "black");
+	   		
+	    })
+	    .on("mouseout", function(d){
+	    	var num = d.data[0].toString();
+	    	d3.select(this)
+	    		.transition()
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc(d);
+	   			});
+	   		d3.select("#lh"+num)
+	   			.transition()
+				.duration(1000)
+				.attr("fill", "none");
+	    })
 	    .on("click", function(d){
-	    	func(d);
+	    	
+	    	updateArc.selectAll("path")
+	    		.transition()
+				.ease('bounce') 
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc(d);
+	   			});
+	   		s=d3.selectAll(".label")
+	   			.attr("fill", "none");
+	    	
+	    	var num = d.data[0].toString();
+	    	d3.select(this)
+	    		.transition()
+				.ease('bounce') 
+				.duration(500)
+	    		.attr("d",function(d){  
+	        		return arc1(d);
+	   			});
+	   		d3.select("#lh"+num)
+//				.transition()
+//				.duration(1000)
+				.attr("fill", "black");
+	   			
+	   		
+	   		func(d);
 	    });
 	
-	//添加标签文字数字
-	enterArc.append("text")  
+//	添加标签文字数字
+	//扇形上的数字
+	enterArc.append("text") 
         .attr("transform",function(d){  
             var x=arc.centroid(d)[0]*1.4;//文字的x坐标  
             var y=arc.centroid(d)[1]*1.4;  
@@ -86,28 +169,20 @@ function drawRoadPie(data, svgId, func){
             return d.data[1];
         });
 	
-	enterArc.append("line")  
-        .attr("stroke","black")  
-        .attr("x1",function(d){  
-            return arc.centroid(d)[0]*2;  
-        })  
-        .attr("y1",function(d){  
-            return arc.centroid(d)[1]*2;  
-        })  
-        .attr("x2",function(d){  
-            return arc.centroid(d)[0]*2.2;  
-        })  
-        .attr("y2",function(d){  
-            return arc.centroid(d)[1]*2.2;  
-        });  
-        
-    enterArc.append("text")  
+    //扇形外的文字
+    enterArc.append("text")
+    	.attr("id", function(d){
+    		var num = "lh" + d.data[0].toString();
+            return num;
+        })
+    	.attr("class", "label")
         .attr("transform",function(d){  
             var x=arc.centroid(d)[0]*2.5;  
             var y=arc.centroid(d)[1]*2.5;  
             return "translate("+x+","+y+")";  
         })  
-        .attr("text-anchor","middle")  
+        .attr("text-anchor","middle") 
+        .attr("fill", "none")
         .text(function(d){  
             return d.data[0];  
         }); 

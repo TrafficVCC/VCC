@@ -2,6 +2,11 @@
 
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+	 <settings>  
+  		<!--解决，查询返回结果含null没有对应字段值问题-->  
+  		<setting name="callSettersOnNulls" value="true"/>  
+  	</settings>  
+
 	<!-- mybatis别名定义 -->
     <typeAliases> 
         <typeAlias alias="RoadNet" type="hfut.vcc.mapping.RoadNet"/> 
@@ -25,6 +30,7 @@
    	  <mapper class = "hfut.vcc.mapping.TimeMapper"/>
    	  <mapper class = "hfut.vcc.mapping.RoadMapper"/>
    	  <mapper class = "hfut.vcc.mapping.RoadNetMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.OtherMapper"/>
    </mappers>
    
 </configuration>

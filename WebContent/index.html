@@ -9,7 +9,11 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="format-detection" content="telephone=no">
-  
+  	
+  	<!--加载百度地图API库-->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
 	<script type="text/javascript" src="js/d3.v3.min.js" ></script>
 	<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
 	<script type="text/javascript" src="js/drawLineByYear.js" ></script>
@@ -23,7 +27,7 @@
 	<script type="text/javascript" src="js/showTimeAnalyze.js" ></script>
 	<script type="text/javascript" src="js/showSpaceAnalyze.js" ></script>
 	<script type="text/javascript" src="js/showDataAnalyze.js" ></script>
-	<script type="text/javascript" src="js/showRoadAnalyze.js" ></script>
+	<script type="text/javascript" src="js/roadmap.js" ></script>
   
 	<link rel="stylesheet" href="css/layui.css"  media="all">
 	<link rel="stylesheet" href="css/content.css" >
@@ -36,7 +40,7 @@
     <!-- 头部区域（可配合layui已有的水平导航） -->
     <ul class="layui-nav layui-layout-left">
       <li class="layui-nav-item"><a href="javascript:showDataAnalyze();">数据分析</a></li>
-      <li class="layui-nav-item"><a href="Map.html">道路提取</a></li>
+      <li class="layui-nav-item"><a href="mapTool.html">道路提取</a></li>
     </ul>
     
   </div>
@@ -47,11 +51,11 @@
       <ul class="layui-nav layui-nav-tree"  lay-filter="test">
       	<li class="layui-nav-item layui-nav-itemed">
           <a id="timeAnalyze" class="" href="javascript:showTimeAnalyze();" >时间分析</a>
-          <!--<dl class="layui-nav-child">
+          <dl class="layui-nav-child">
             <dd><a href="javascript:;">列表一</a></dd>
             <dd><a href="javascript:;">列表二</a></dd>
             <dd><a href="javascript:;">列表三</a></dd>
-          </dl>-->
+          </dl>
       	</li>
         <li class="layui-nav-item">
         	<a href="javascript:showSpaceAnalyze();">空间分析</a>
@@ -66,9 +70,8 @@
 	    <div class="PA" >
 	    <svg id="timeA" class="" width="650" height="250"  ></svg>
 	    </div>
-	    <div class="PB"  style="background-color: bisque;">
-	   		 MAP
-	    <svg id="timeB" height="500" width="800" ></svg>
+	    <div class="PB" id="PBMap" style="background-color: bisque;">
+	   		 MAP    
 	    </div>
 	    <div class="PC" style="float: left;">
 	    <svg id="timeC1" width="200" height="200" ></svg>
@@ -88,9 +91,8 @@
     	<div class="SA">
     		<svg id="spaceA" width="500" height="500"></svg>
     	</div>
-    	<div class="SB" style="background-color: bisque;">
+    	<div class="SB" id="SBMap" style="background-color: bisque;">
     		MAP
-    	<svg id="spaceB" width="800" height="500"></svg>
     	</div>
     	<div class="SC">
     		<svg id="spaceC" width="250" height="250"></svg>
@@ -98,9 +100,6 @@
     	<div class="SD">
     		<svg id="spaceD" width="1000" height="250"></svg>
     	</div>
-    </div>
-    <div id="content3">
-    	roadMap
     </div>
   </div>
   
@@ -112,8 +111,9 @@
 <script src="js/layui.all.js" charset="utf-8"></script>
 
 <script>
-	
-	
+//创建地图
+displayMap("PBMap");
+displayMap("SBMap");
 </script>
 
 </body>

@@ -16,9 +16,22 @@
     </delete>
     
     <select id="selectRoad" parameterType="String" resultType="hashmap">
-    	select id, ld, lng, lat
+    	select id, ld, lng, lat, distance
     	from roadnet
     	where way = #{way}
     </select>
-
+	
+	<select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
+     	select jdwz from jysg
+     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     </select>
+     
+     <select id = "selectxzqh" parameterType="hashmap" resultType="hashmap">
+     	select xzqh, xzqhms, count(*) as count
+     	from jysg
+     	where YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     	group by xzqh, xzqhms
+		ORDER BY count
+     </select>
+	
 </mapper>

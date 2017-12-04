@@ -2,8 +2,11 @@ package hfut.vcc.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,39 +15,33 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.session.SqlSession;
 import org.json.*;
-import java.util.*;
-
-import hfut.vcc.mapping.RoadMapper;
 import hfut.vcc.util.*;
+import hfut.vcc.mapping.*;
 
 /**
- * Servlet implementation class RoadServlet
+ * Servlet implementation class RoadNetServlet
  */
-@WebServlet("/RoadServlet")
-public class RoadServlet extends HttpServlet {
+@WebServlet("/RoadNetServlet")
+public class RoadNetServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private JSONArray js_jdwz;
+	private JSONArray js_road;
+	private JSONArray js_xzqh;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public RoadServlet() {
+    public RoadNetServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
-
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		// TODO Auto-generated method stub
-	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
 		Map<String,String> params = new HashMap<String,String>();
 		//获取所有参数集合(由于不确定前端传来的有哪些参数，所以需获取其所有参数)
         Map<String, String[]> parameterMap=request.getParameterMap();  
@@ -52,14 +49,23 @@ public class RoadServlet extends HttpServlet {
             params.put(key, parameterMap.get(key)[0]);
         }  
         
-    	JSONArray js = new JSONArray();
+        JSONArray js = new JSONArray();
 		try {
-			js = getJSONData(params);
+			if(params.get("type").equals("road")) {
+				getJSONData(params);
+				js = js_road;
+			}
+			else {
+				getxzqhJSON(params);
+				js = js_xzqh;
+			}
+			
 		}
 		catch(JSONException e) {
 			e.printStackTrace();
 		}
 		
+		response.setContentType("text/html;charset=utf-8");  //解决前端中文乱码
 		System.out.println(js);
 		PrintWriter out = response.getWriter();
 		out.print(js.toString());
@@ -75,30 +81,33 @@ public class RoadServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONArray getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
-		
+	private void getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
 		SqlSession session = MyBatisUtil.getSqlSession();
-		RoadMapper road = session.getMapper(RoadMapper.class);
+		RoadNetMapper roadnet = session.getMapper(RoadNetMapper.class);
 		
-		List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
-		String type = params.get("type");
-		if(type.equals("lh")) {
-			li = road.roadlhQuery(params);
-		}
-		else if(type.equals("jdwz")) {
-			li = road.roadjdwzQuery(params);
-		}
-		else if(type.equals("interval")) {
-			li = road.intervalQuery(params);
-		}
-		else {
-			throw new IllegalArgumentException ("Invalid type");
-		}
+		List<Map<String,Object>> li_jdwz = new ArrayList<Map<String,Object>>();
+		List<Map<String,Object>> li_road = new ArrayList<Map<String,Object>>();
+		li_jdwz = roadnet.selectjdwz(params);
+		li_road = roadnet.selectRoad(params.get("lm"));
+		//System.out.println(li);
 		
-		JSONArray js = MySqlUtil.listToJSON(li);
+		js_jdwz = MySqlUtil.listToJSON(li_jdwz);
+		js_road = MySqlUtil.listToJSON(li_road);
+		
 		session.close();
+	}
+	
+	private void getxzqhJSON(Map<String,String> params) throws JSONException, IllegalArgumentException {
+		SqlSession session = MyBatisUtil.getSqlSession();
+		RoadNetMapper roadnet = session.getMapper(RoadNetMapper.class);
 		
-		return js;
+		List<Map<String,Object>> li_xzqh = new ArrayList<Map<String,Object>>();
+		li_xzqh = roadnet.selectxzqh(params);
+		//System.out.println(li);
+		
+		js_xzqh = MySqlUtil.listToJSON(li_xzqh);
+		
+		session.close();
 	}
 
 }

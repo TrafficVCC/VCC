@@ -78,7 +78,7 @@
 	        function(data,status){
 		 	    
 		 	    js = eval('(' + data + ')');
-		 	    alert(js);
+//		 	    alert(js);
 	            for(var i=0; i<js.length; i++) {
 	            	console.log(js[i]);
 	            }
@@ -98,8 +98,13 @@
 	//点击日历
 	///////////////////////
 	function clickCal(d){
-		var layer = layui.layer;
-		layer.msg("hello");
+//		var layer = layui.layer;
+		var date = d[0];
+		var getDate = d3.time.format('%x');
+		var strs = getDate(date).split("/");
+		var str= strs[2]+"年"+strs[0]+"月"+strs[1]+"日  事故数量:"+d[1].toString();
+		
+		layer.msg(str);
 	}
 
 

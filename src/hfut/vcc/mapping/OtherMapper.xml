@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.OtherMapper">
+
+	<select id="clisgQuery" resultType="hashmap">
+		select * from cljsg
+	</select> 
+	
+	<select id="dcsgQuery" resultType="hashmap">
+		select * from dcsg
+	</select> 
+	
+	<select id="rdyyflQuery" resultType="hashmap">
+		select * from rdyyfl
+	</select> 
+	
+	<select id="sgxtQuery" resultType="hashmap">
+		select * from sgxt
+	</select> 
+	
+	<select id="tqQuery" resultType="hashmap">
+		select * from tq
+	</select> 
+	
+	<select id="xzqhQuery" resultType="hashmap">
+		select * from xzqh;
+	</select> 
+	
+	<!-- tq,cljsg,dcsg,rdyyfl,sgxt,xzqh查询 -->
+	<select id="factorQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap">
+     	select tq, cljsg, dcsg, sgxt, xzqh
+		from jysg 
+		<![CDATA[ where YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]>  
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+     </select>
+     
+     <select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
+     	select jdwz from jysg
+     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     </select>
+     
+     <select id = "selectRoadNet" parameterType="hashmap" resultType="java.util.LinkedHashMap">
+     	select id, lng, lat, distance
+    	from roadnet
+    	where way = #{lm}
+     </select>
+     
+</mapper>

@@ -16,7 +16,7 @@ function drawLineByYear(data, svgId, func){
 	var height = d3.select("#"+svgId).attr("height");
 	//	alert(width, height);
 	//边缘
-	var padding = {top:(30), right:(50), bottom:(30), left:(50) };
+	var padding = {top:(50), right:(50), bottom:(50), left:(50) };
 
 	//求y向数据最大值，以确定y向比例尺
 	var ymax = 0;
@@ -28,7 +28,7 @@ function drawLineByYear(data, svgId, func){
 	var xScale = d3.scale.linear()//time.scale()
         .domain([dataset[0][0], dataset[dataset.length-1][0]]);
     var yScale = d3.scale.linear()
-		.domain([0, ymax])
+		.domain([0, ymax]);
     xScale.range([0, width - padding.left - padding.right]);
     yScale.range([height - padding.top - padding.bottom, 0]);
 	
@@ -80,10 +80,20 @@ function drawLineByYear(data, svgId, func){
 		.attr("class", "xaxis")
         .attr("transform", "translate(" + padding.left + "," + (height - padding.bottom) + ")")
         .call(x_axis);
+    s.append("g")
+    	.append("text")
+        .text("年份")
+        .attr("transform", "translate(" + (width-padding.right/1.5) + "," + (height - padding.bottom) + ")");
+        
 	s.append("g")
 		.attr("class", "yaxis")
 		.attr("transform", "translate("+ padding.left +"," + padding.top + ")")
 		.call(y_axis);
+	s.append("g")
+		.append("text")
+        .text("事故数量")
+        .attr("transform", "translate(" + 0 + "," +  padding.bottom/2 + ")");
+        
 
                    
 	//画点
@@ -95,6 +105,7 @@ function drawLineByYear(data, svgId, func){
     updatePoints.attr("id", function(d){
             return d[0];
         })
+    	.attr("class","c")
         .attr('cx', function(d) {  
             return xScale(d[0])+padding.left;  
         })  
@@ -106,33 +117,56 @@ function drawLineByYear(data, svgId, func){
         })
         .attr("fill", d3.rgb(62,82,91) )
         .on("click",function(d){
-        	func(d)
+        	s.select("#sc")
+        		.remove();
+        	s.select("#st")
+        		.remove();
+        	s.append("circle")
+        		.attr("id","sc")
+        		.attr("fill", d3.rgb(62,82,91))
+        		.attr('cx', xScale(d[0])+padding.left)  
+		        .attr('cy', yScale(d[1])+padding.top)  
+		        .attr('r', Math.sqrt(height/4));
+		    s.append("text")
+	            .attr("id", "st")
+	            .text(d[1])
+	            .transition()
+	            .duration(500)
+	            .attr("x", function(){
+	                return xScale(d[0]) +padding.left -10;
+	            })
+	            .attr("y", function() {
+	                return yScale(d[1]) +padding.top -10;
+	            })
+	            .attr("fill", d3.rgb(62,82,91));
+        	
+        	func(d);
         })
         .on("mouseover", function(d){
-	        d3.select(this)
-	            .transition()
-	            .duration(300)
-	            .attr('r',  function(d) {  
-	                return Math.sqrt(height/5);  
-	            });
+//	        d3.select(this)
+//	            .transition()
+//	            .duration(300)
+//	            .attr('r',  function(d) {  
+//	                return Math.sqrt(height/4);  
+//	            });
 	    
 	        s.append("text")
 	            .attr("id", "text")
 	            .text(d[1])
 	            .attr("x", function(){
-	                return xScale(d[0]) +padding.left +10;
+	                return xScale(d[0]) +padding.left -10;
 	            })
 	            .attr("y", function() {
-	                return yScale(d[1]) +padding.top +10;
+	                return yScale(d[1]) +padding.top -10;
 	            })
 	            .attr("fill", d3.rgb(62,82,91));
 
         })
         .on("mouseout", function(d){
-        	d3.select(this)
-        		.attr('r', function(d) {  
-		            return Math.sqrt(height/7);  
-		        });
+//      	d3.select(this)
+//      		.attr('r', function(d) {  
+//		            return Math.sqrt(height/7);  
+//		        });
 	        d3.select("#text")
 	            .remove();
         });
@@ -152,15 +186,39 @@ function drawLineByYear(data, svgId, func){
         })
         .attr("fill", d3.rgb(62,82,91) )
         .on("click",function(d){
-        	func(d)
+        	s.select("#sc")
+        		.remove();
+        	s.select("#st")
+        		.remove();
+        	s.append("circle")
+        		.attr("id","sc")
+        		.attr("fill", d3.rgb(62,82,91))
+        		.attr('cx', xScale(d[0])+padding.left)  
+		        .attr('cy', yScale(d[1])+padding.top)  
+		        .attr('r', Math.sqrt(height/4));
+		    s.append("text")
+	            .attr("id", "st")
+	            .text(d[1])
+	            .transition()
+	            .duration(500)
+	            .attr("x", function(){
+	                return xScale(d[0]) +padding.left -10;
+	            })
+	            .attr("y", function() {
+	                return yScale(d[1]) +padding.top -10;
+	            })
+	            .attr("fill", d3.rgb(62,82,91));
+	            
+        	func(d);
         })
         .on("mouseover", function(d){
-	        d3.select(this)
-	            .transition()
-	            .duration(300)
-	            .attr('r',  function(d) {  
-	                return Math.sqrt(height/5);  
-	            });
+//	        d3.select(this)
+//	            .transition()
+//	            .ease('bounce')
+//	            .duration(300)
+//	            .attr('r',  function(d) {  
+//	                return Math.sqrt(height/4);  
+//	            });
 	    
 	        s.append("text")
 	            .attr("id", "text")
@@ -177,15 +235,17 @@ function drawLineByYear(data, svgId, func){
 
         })
         .on("mouseout", function(d){
-        	d3.select(this)
-        		.attr('r', function(d) {  
-		            return Math.sqrt(height/7);  
-		        });
+//      	d3.select(this)
+//      		.attr('r', function(d) {  
+//		            return Math.sqrt(height/7);  
+//		        });
 	        d3.select("#text")
 	            .remove();
         });
-        
+    
 	exitPoints.remove();
+	
+
 		    
 
 

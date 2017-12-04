@@ -16,7 +16,10 @@ function drawRoseGraph(data, svgId, func){
 	var width = d3.select("#"+svgId).attr("width");
 	var height = d3.select("#"+svgId).attr("height");
 	//边缘
-	var padding = {top:(height/20), right:(width/20), bottom:(height/20), left:(width/20) };
+	var padding = width/20;
+	
+	width = width - padding*2;
+	height = height - padding*2;
 	
 	//求最大最小值
 	var getmax = function(a){
@@ -117,6 +120,57 @@ function drawRoseGraph(data, svgId, func){
 		.on("click", function(d, i){
 			func(d);
 		}); 
-        
+    
+    //标签文字
+    var labels = [];
+    for(var i=0; i<piece; i++){
+    	labels.push(i+1);
+    }
+    console.log(labels);
+    var labeldata = [];
+    labels.forEach(function(d,i){
+    	labeldata.push({"startAngle":angles[i],	"endAngle":angles[i+1], "padAngle":0, "value":d});
+    })
+    console.log(labeldata);
+    
+    var labelArc = d3.svg.arc()
+		    			.innerRadius(0)
+		    			.outerRadius((width/3)*1.05);
+	var l = s.selectAll(".label");
+	var lg = l.data(labeldata)
+				.enter()
+				.append("g")
+				.attr("class", "label")
+				.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
+	lg.append("text")
+		.attr("transform",function(d){  
+            var x=labelArc.centroid(d)[0]*2.5;  
+            var y=labelArc.centroid(d)[1]*2.5+4;  
+            return "translate("+x+","+y+")";  
+        })  
+        .attr("text-anchor","middle") 
+        .attr("fill", d3.rgb(175,0,0))
+        .text(function(d){  
+            return d.value;  
+        }); 
+	
+	var type = "";
+	if(piece==4){
+		type="季度";
+	}
+	else if(piece==12){
+		type="月份";
+	}
+	else if(piece==7){
+		type="星期";
+	}
+	else{
+		type="other";
+	}
+//	console.log(type)
+	s.append("text")
+		.attr("id", "type")
+		.text(type)
+        .attr("transform", "translate("+(padding*2)+","+padding*2+")");;
 
 }

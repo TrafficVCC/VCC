@@ -66,6 +66,13 @@ function drawYearCal(syear, data, svgId, func){
 	s.selectAll("g")
 		.remove();
 	
+	s.append("g")
+		.append("text")
+		.text("-"+syear+"-")
+		.attr("id", "year")
+        .attr("transform", "translate("+0+","+padding/4+")");
+        
+	
 	var w = s.append("g")
 				.attr("id","week");
 	var x = w.selectAll("text")
@@ -76,7 +83,7 @@ function drawYearCal(syear, data, svgId, func){
 				.attr("y", function(d, i){
 					return padding+rectsize*(i);
 				})
-				.attr("fill","#ccc")
+				.attr("fill","#000")
 //				.attr("font-size", rectsize/2)
 				.text(function(d){
 					return d;
@@ -92,7 +99,7 @@ function drawYearCal(syear, data, svgId, func){
 					return padding+rectsize*(d[0]-1);
 				})
 				.attr("y", rectsize*1.5)
-				.attr("fill","#ccc")
+				.attr("fill","#000")
 				.text(function(d,i){
 					return d[1];
 //					return i+1;

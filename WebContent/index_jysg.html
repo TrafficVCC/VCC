@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>简易事故分析</title>
+		<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+		<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+		<script type="text/javascript" src="js/drawStackedLine.js" ></script>
+		<script type="text/javascript" src="js/drawParallelAxis.js" ></script>
+		<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
+		
+		<!--加载百度地图API库-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	<!--加载鼠标绘制工具-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+
+		
+		<link rel="stylesheet" href="css/content_jysg.css" />
+		
+		 <style type="text/css">
+        html{height: 100%;}
+        body{height: 100%; margin: 0px; padding: 0px;}
+        /*去除地图左下方baidu logo*/
+        .BMap_cpyCtrl {display: none;}
+        .anchorBL {display: none;}
+    </style>
+	</head>
+	
+	<body>
+		<div id="content">
+			
+		<div id="contentA">
+			<svg id="graphA" width="600" height="300"></svg>
+		</div>
+		
+		<div id="contentB">
+			<svg id="graphB" width="300" height="300"></svg>
+		</div>
+		
+		<div id="contentC">
+			<svg id="graphC" width="600" height="400"></svg>
+		</div>
+		
+		<div id="contentD">
+			<!--<div id="map" width="900" height="600"></div>-->
+		</div>
+		
+		<div id="contentE">
+			<!--<svg id="graphE" width="1000" height="400"></svg>-->
+		</div>
+		
+		</div>
+	</body>
+	
+	<script>
+		   
+        $.post("/Demo/TimeServlet",
+		{
+			"type":"month",   //月份
+			"starty" :"2014",
+			"endy" : "2016",
+			"set" : "0"     //全体
+	    },
+            function(data,status){
+	    	js = eval('(' + data + ')');
+            console.log("数据：" + data + "\n状态：" + status);
+            drawStackedLine(js, "graphA");
+   	    });
+   	    
+        $.post("/Demo/TimeServlet",
+        		{
+        			"type":"month",   //月份
+        			"starty" :"2014",
+        			"endy" : "2016",
+        			"set" : "0"     //全体
+        	    },
+                    function(data,status){
+        	    	js = eval('(' + data + ')');
+                    console.log("数据：" + data + "\n状态：" + status);
+                    drawRoseGraph(js, "graphB");
+           	    });
+		
+        $.post("/Demo/OtherServlet",                
+        		{
+        			"starty" :"2014",
+        			"endy" : "2016",
+        			"set" : "30022"     //全体
+        	    },
+                    function(data,status){
+        	    	js = eval('(' + data + ')');
+                   // console.log("数据：" + data + "\n状态：" + status);
+                    drawParallelAxis(js,"graphC");
+           	    });
+		//drawParallelAxis([["1","3","16","37","340101"]],"graphC",show)
+		
+		
+		 $.post("/Demo/RoadNetServlet",
+        		{
+			 		"type": "road",
+        			"year": "2016",
+        			"month": "12",
+        			"lm": "徽州大道"
+        	    },
+                    function(data,status){
+        	    	js = eval('(' + data + ')');
+                    console.log("数据：" + data + "\n状态：" + status);
+                    displayRoad(js);
+           	    });
+		
+		/*
+		 $.post("/Demo/RoadNetServlet",
+	        		{
+				 		"type": "xzqh",
+	        			"year": "2016",
+	        			"month": "12",
+	        	    },
+	                    function(data,status){
+	        	    	js = eval('(' + data + ')');
+	                    console.log(data);
+	                    // displayXzqh(js);
+	           	    });
+		*/
+	
+	</script>
+	
+	<script>
+		//创建地图
+	    var map = new BMap.Map("contentD", {enableMapClick:false});
+	    map.centerAndZoom("合肥",15);
+	    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	    
+	    function displayXzqh(data) {
+	    	var min = data[0].count;
+	    	var max = data[data.length-1].count;
+	    	var offset = 200; //偏移量
+	    	
+	    	for(var i=0; i<data.length; i++) {
+	    		var xzqhms = data[i].xzqhms;
+	    		//alert(xzqhms);
+	    		var count = data[i].count;
+	    		//根据count大小设置其fillOpacity深浅(归一化到0-1)
+	    		var fill = parseFloat((count - min + offset))/parseFloat((max - min)) * 1.5;
+	    		if(fill > 1) fill = 1.0;
+		        var styleOptions = {
+			            strokeColor:"blue",    //边线颜色。
+			            fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+			            strokeWeight: 2,       //边线的宽度，以像素为单位。
+			            //strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
+			            fillOpacity: fill,      //填充的透明度，取值范围0 - 1。
+			            strokeStyle: 'solid', //边线的样式，solid或dashed。
+			            enableEditing: false
+			        }
+	    		console.log(fill); 
+		      //  if(xzqhms!="市辖区" && xzqhms!="高速")
+		        	getBoundary(xzqhms, styleOptions);	
+	    	}
+	    	map.centerAndZoom("合肥",10);
+	    }
+	    
+		function getBoundary(xzqhms,styleOptions) {       
+			var bdary = new BMap.Boundary();
+			bdary.get("合肥市"+xzqhms, function(rs){       //获取行政区域
+				//map.clearOverlays();        //清除地图覆盖物       
+				var count = rs.boundaries.length; //行政区域的点有多少个
+				if (count === 0) {
+					//alert('未能获取当前输入行政区域');
+					return ;
+				}
+	          	var pointArray = [];
+				for (var i = 0; i < count; i++) {
+					var ply = new BMap.Polygon(rs.boundaries[i], styleOptions); //建立多边形覆盖物
+					map.addOverlay(ply);  //添加覆盖物
+					pointArray = pointArray.concat(ply.getPath());
+				}    
+				//map.setViewport(pointArray);    //调整视野  
+				//addlabel();               
+			});   
+		}
+	    
+	    function displayRoad(data) {
+	    	var overlays = [];
+	        var points = [];
+	        var ld = 0;
+	        for(var i=0; i<data.length; i++) {
+	        	if(data[i].ld == ld) {
+	        		var p = new BMap.Point(data[i].lng, data[i].lat);
+	        		var marker = new BMap.Marker(p);	//添加标注
+	        		map.addOverlay(marker);
+	                points.push(p);	
+	        	}
+	        	else {
+	        		overlays.push(points);
+	        		points = [];
+	        		var p = new BMap.Point(data[i].lng, data[i].lat);
+	        		var marker = new BMap.Marker(p);
+	        		map.addOverlay(marker);
+	                points.push(p);
+	        		ld = ld + 1;
+	        	}
+	        }
+	        overlays.push(points);
+	        console.log(overlays);
+			
+	        var styleOptions = {
+	            strokeColor:"blue",    //边线颜色。
+	            fillColor:"blue",      //填充颜色。当参数为空时，圆形将没有填充效果。
+	            strokeWeight: 6,       //边线的宽度，以像素为单位。
+	            strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
+	            fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+	            strokeStyle: 'solid', //边线的样式，solid或dashed。
+	            enableEditing: false
+	        }
+	        for(var i=0; i<overlays.length; i++) {
+	        	var polyline = new BMap.Polyline(overlays[i], styleOptions)
+	            map.addOverlay(polyline);	
+	        }
+	    }
+	</script>
+</html>
