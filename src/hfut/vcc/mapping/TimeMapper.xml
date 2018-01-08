@@ -84,5 +84,21 @@
      	group by date
      	order by date
      </select>
+     
+     <select id="testMonthQuery" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year , MONTH(sgfssj) as month, count(*) as count
+		from jysg 
+		where sgfssj is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year,month
+        having year in 
+        <foreach item="item" index="index" collection="year"
+      		open="(" separator="," close=")">
+        		#{item}
+  		</foreach>
+        order by year
+     </select>
     
 </mapper>

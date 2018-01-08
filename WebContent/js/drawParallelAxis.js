@@ -3,12 +3,10 @@
 
 function drawParallelAxis(data, svgId, func){
 	
-	//提取svg的宽度长度
+		//提取画布
 	var width = d3.select("#"+svgId).attr("width");
 	var height = d3.select("#"+svgId).attr("height");
-	//	alert(width, height);
-	//边缘
-	var padding = {top:(60), right:(50), bottom:(50), left:(50) };
+	var padding = {top: 30, right: 10, bottom: 10, left: 30};
 	
 	//定义维度数据
 	var dimensions = [
@@ -75,74 +73,132 @@ function drawParallelAxis(data, svgId, func){
 //						.tick(d.index.lenght);
 	});
 	
+	//属性名
+	var a = []; 
+	//x轴
+	var xScale = d3.scale.linear()
+				.domain([0,dimensions.length])
+				.range([0, width - padding.right - padding.left]);
+	//y轴们
+	var yScales = [];
+	dimensions.forEach(function(d,i){
+		yScales[i]=d.scale;
+		a.push(d.name);
+	})
+	console.log(a);
+	
+	//数据
 	var dataset = [];
-	data.forEach(function(d){
-		var a = [];
+	data.forEach(function(d,i){
+		var b = [];
 		d.forEach(function(d,i){
-//			a.push({"x":i, "y":dimensions[i].scale(d)});
-			a.push([i, dimensions[i].scale(d)]);
+			b.push(yScales[i](d));
 		})
-		dataset.push(a);
+		dataset.push(b);
 	});
 	console.log(dataset);
 	
-	//
+	$("svg#"+svgId).empty();
+	//绑定画布
 	var s = d3.select("#"+svgId);
 	
-	var xScale = d3.scale.linear()
-					.domain([0,dimensions.length])
-					.range([0, width - padding.right - padding.left]);
-	
-	s.selectAll("g.axis").remove();
-	//画维度的比例线
-	dimensions.forEach(function(d,i){
-		var axis = d3.svg.axis()
-						.scale(d.scale)
-	                    .orient("right")
-	                    .ticks(5);
-	    s.append("g")
-	    	.attr("class", "axis")
-	    	.attr("transform", "translate("+ (padding.left+xScale(i)) +"," + padding.top + ")")
-			.call(axis);
-		s.append("text")
-			.attr("class", "label")
-			.attr("transform", "translate("+ (padding.left+xScale(i)) +"," + padding.top/2 + ")")
-			.text(d.name);
-
-	})
+	s.selectAll("g")
+		.remove;
 	
 
 	
+	var dragging = {};
 	
-	//数据折线
+	var line = d3.svg.line();
+	var axis = d3.svg.axis().orient("left");
+//	var background;
+//	var foreground;
+	
+	
 	var linePath =d3.svg.line()
-        .x(function(d){
-            return xScale(d[0]) + padding.left;
+        .x(function(d,i){
+            return xScale(i) + padding.left;
         })
-        .y(function(d){
-            return d[1] + padding.top;
-        });   
-    
-    var gLine = s.selectAll("g.lines");
-    var updateGLine = gLine.data(dataset);
-    var enterGLine = updateGLine.enter();
-    var exitGLine = updateGLine.exit();
-    exitGLine.remove();
-    
-    var updateL = updateGLine.selectAll("path.line");
-    updateL.attr("d", function(d){
+        .y(function(d,i){
+            return d + padding.top;
+        }); 
+	
+	var background = s.append("g")
+		.attr("class", "background")
+		.selectAll("path")
+		.data(dataset)
+		.enter()
+		.append("path")
+		.attr("d", function(d){
     		return linePath(d);
     	});
-    
-    var enterL = enterGLine.append("g")
-    						.attr("class", "lines");
-    enterL.append("path")
-   		.attr("class", "line")
-    	.attr("d",function(d){
-    		console.log(linePath(d));
+    	
+    var foreground = s.append("g")
+	    .attr("class", "foreground")
+	    .selectAll("path")
+	    .data(dataset)
+	    .enter()
+	    .append("path")
+	    .attr("d", function(d){
     		return linePath(d);
-    	})
-		.attr("stroke", d3.rgb(62,82,91))
-        .attr("stroke-width", 2)
-        .attr("fill", "none");
+    	});
+
+
+	
+	var g = s.selectAll(".dimension")
+				.data(a)
+				.enter()
+				.append("g")
+				.attr("class", "dimension")
+				.attr("transform", function(d,i) { 
+					return "translate(" + (xScale(i)+padding.left)  + ","+ padding.top + ")"; 
+				});
+
+		
+	g.append("g")
+		.attr("class", "axis")
+		.each(function(d,i){ 
+			d3.select(this)
+				.call(axis.scale(yScales[i])); 
+		})
+		.append("text")
+		.style("text-anchor", "middle")
+		.attr("y", -9)
+		.text(function(d,i){ 
+			return d; 
+		});
+	
+	g.append("g")
+		.attr("class", "brush")
+		.each(function(d,i) {
+        	d3.select(this)
+        		.call(yScales[i].brush = d3.svg.brush()
+        			.y(yScales[i])
+        			.on("brushstart", brushstart)
+        			.on("brush", brush));
+		})
+		.selectAll("rect")
+		.attr("x", -8)
+		.attr("width", 16);
+	
+
+	
+	function brushstart() {
+		d3.event.sourceEvent.stopPropagation();
+	}
+	
+	function brush(){
+		var actives = a.filter(function(d,i) { 
+			return !yScales[i].brush.empty(); 
+		});
+		var extents = actives.map(function(d,i) { 
+			return yScales[i].brush.extent(); 
+		});
+		
+		foreground.style("display", function(d) {
+		    return actives.every(function(p, i) {
+		    	return extents[i][0] <= d[i] && d[i] <= extents[i][1];
+		    }) ? null : "none";
+		});
+	}
 }

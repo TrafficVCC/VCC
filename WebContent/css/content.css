@@ -1,80 +1,80 @@
-		#content1{
-			padding: 15px; display: none; 
-			height: 1000px;
-			width: 1500px;
-		}
-		#content2{
-			padding: 15px; display: none; 
-			height: 1000px;
-			width: 1500px;
-		}
+#content1{
+	padding: 15px; display: none; 
+	height: 1000px;
+	width: 1500px;
+}
+#content2{
+	padding: 15px; display: none; 
+	height: 1000px;
+	width: 1500px;
+}
+
+div.PA{
+	padding-bottom: 50px;
+	height: 250px;
+	width: 650px;
+}
+div.PB{
+	position: absolute;
+	left:700px;
+	top: 20px;
+	height: 500;
+	width:800;
+}
+div.PC{
+	height: 200;
+	width: 650;
+}
+#timeC1{
+	position: absolute;
+	top: 300px;
+	float: left;
+}
+#timeC2{
+	position: absolute;
+	left: 225px;
+	top: 300px;
+	float: left;
+}
+#timeC3{
+	position: absolute;
+	left: 450px;
+	top: 300px;
+	float: left;
+}
+div.PD{
+	position: absolute;
+	top: 520px;
+	left: 50px;
+	height: 400;
+	width: 800;
+}
+div.SA{
+	position: absolute;
+	top: 20px;
+	height: 500;
+	width: 500;
+}
+div.SB{
+	position: absolute;
+	top: 20px;
+	left: 550px;
+	height: 500;
+	width: 800;
+}
+div.SC{
+	position: absolute;
+	top: 520px;
+	left:50px;
+	width: 250;
+	height: 250;
+}
+div.SD{
+	position: absolute;
+	top: 520px;
+	left: 400px;
+	width: 1000;
+	height: 250;
+}
 
 
-		div.PA{
-			padding-bottom: 50px;
-			height: 250px;
-			width: 650px;
-		}
-		div.PB{
-			position: absolute;
-			left:700px;
-			top: 20px;
-			height: 500px;
-			width:700px;
-			
-		}
-		div.PC{
-			height: 200;
-			width: 600;
-		}
-		#timeC1{
-			position: absolute;
-			top: 300px;
-			float: left;
-		}
-		#timeC2{
-			position: absolute;
-			left: 200px;
-			top: 300px;
-			float: left;
-		}
-		#timeC3{
-			position: absolute;
-			left: 400px;
-			top: 300px;
-			float: left;
-		}
-		div.PD{
-			position: absolute;
-			top: 550px;
-			left: 50px;
-			height: 800;
-			width: 1600;
-		}
-		div.SA{
-			position: absolute;
-			top: 20px;
-			height: 500;
-			width: 500;
-		}
-		div.SB{
-			position: absolute;
-			top: 20px;
-			left: 550px;
-			height: 500px;
-			width: 800px;
-		}
-		div.SC{
-			position: absolute;
-			top: 550px;
-			left:50px;
-			width: 250;
-			height: 250;
-		}
-		div.SD{
-			position: absolute;
-			top: 550px;
-			left: 400px;
-			width: 1000;
-			height: 250;
-		}

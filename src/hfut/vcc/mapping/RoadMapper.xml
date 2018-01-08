@@ -5,14 +5,14 @@
 
 	<select id="roadlhQuery" parameterType="hashmap" resultType="hashmap">
 		select lh , count(*) as count
-		from ybsg1
+		from jysg
 		where lh is not null and
 		<![CDATA[ YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]> 
 		<if test='set!="0"'>
 			and lh = #{set}
 		</if>
 		group by lh
-		order by lh
+		order by count desc
 	</select>
 	
 	<select id="roadjdwzQuery" parameterType="hashmap" resultType="hashmap">
@@ -28,6 +28,18 @@
 	 	SELECT @id:=@id+1 as id,lh,DATE(sgfssj) as time,DATEDIFF(DATE(sgfssj),@prev_time) as diff, (@prev_time:=DATE(sgfssj))
 		FROM (SELECT lh,sgfssj from ybsg1 WHERE lh= #{set} ORDER BY sgfssj) as T, (SELECT @id:=0) as B, (SELECT @prev_time:='2016-01-01') as C ) as A 
 		<![CDATA[ WHERE diff >= 0 ]]> 
+	</select>
+	
+	<select id="selectjdwz" parameterType="hashmap" resultType="hashmap">
+		select jdwz, count(*) as count
+		from jysg
+		where lh is not null and
+		<![CDATA[ YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]> 
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by jdwz
+		order by count
 	</select>
 
 </mapper>

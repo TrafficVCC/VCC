@@ -10,4 +10,7 @@ public interface RoadMapper {
 	
 	//查询某条路相邻两次交通事故间隔天数
 	public List intervalQuery(Map params);
+	
+	//查询各jdwz对应的数量
+	public List selectjdwz(Map params);
 }

@@ -16,4 +16,7 @@ public interface RoadNetMapper {
     
     //按行政区划查询
     public List selectxzqh(Map params);
+    
+    //按sgdd查询
+    public List selectsgdd(Map params);
 }

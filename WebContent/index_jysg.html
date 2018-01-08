@@ -8,109 +8,113 @@
 		<script type="text/javascript" src="js/drawStackedLine.js" ></script>
 		<script type="text/javascript" src="js/drawParallelAxis.js" ></script>
 		<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
+		<script type="text/javascript" src="js/jysg_clickFuncs.js" ></script>
+		<script type="text/javascript" src="js/drawYearCal.js" ></script>
+		<script type="text/javascript" src="js/drawMonthLine.js" ></script>
+		<script type="text/javascript" src="js/writeRoadList.js" ></script>
+		<script type="text/javascript" src="js/jysg_start.js" ></script>
+		<script type="text/javascript" src="js/drawCountOnRoad.js" ></script>
 		
 		<!--加载百度地图API库-->
     	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
     	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
     	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	<script src="http://mapv.baidu.com/build/mapv.min.js"></script>	
+    	<script src="js/drawMap.js"></script>
     	<!--加载鼠标绘制工具-->
     	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
     	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
-
 		
 		<link rel="stylesheet" href="css/content_jysg.css" />
-		
-		 <style type="text/css">
-        html{height: 100%;}
-        body{height: 100%; margin: 0px; padding: 0px;}
+		<style type="text/css">
         /*去除地图左下方baidu logo*/
         .BMap_cpyCtrl {display: none;}
         .anchorBL {display: none;}
-    </style>
+    	</style>
+    	
 	</head>
 	
 	<body>
 		<div id="content">
 			
 		<div id="contentA">
-			<svg id="graphA" width="600" height="300"></svg>
+			<svg id="graphA1" width="600" height="300"></svg>
+			<svg id="graphA2" width="600" height="300"></svg>
+			<!--<div id="contentA1">
+				<svg id="graphA1" width="600" height="300"></svg>
+			</div>
+			<div id="contentA2">
+				<svg id="graphA2" width="600" height="300"></svg>
+			</div>-->
+			<button id="btnA1" onclick="clickbtnA1()">1</button>
+			<button id="btnA2" onclick="clickbtnA2()">2</button>
+			<button id="btnA3" onclick="clickbtnA3()">显示</button>
+			<button id="btnA4" onclick="clickbtnA4()">重置</button>
 		</div>
+
 		
 		<div id="contentB">
-			<svg id="graphB" width="300" height="300"></svg>
+			<svg id="graphB" width="600" height="300"></svg>
+			<button id="btnB1" onclick="clickbtnB1()" >锁定</button>
 		</div>
 		
 		<div id="contentC">
-			<svg id="graphC" width="600" height="400"></svg>
+			<svg id="graphC" width="600" height="700"></svg>
 		</div>
 		
 		<div id="contentD">
-			<!--<div id="map" width="900" height="600"></div>-->
 		</div>
 		
 		<div id="contentE">
-			<!--<svg id="graphE" width="1000" height="400"></svg>-->
+			<svg id="graphE" width="1200" height="400"></svg>
 		</div>
 		
 		</div>
 	</body>
+
+	<script src="js/jysgAnalyze.js" ></script>
 	
 	<script>
-		   
-        $.post("/Demo/TimeServlet",
-		{
-			"type":"month",   //月份
-			"starty" :"2014",
-			"endy" : "2016",
-			"set" : "0"     //全体
-	    },
-            function(data,status){
-	    	js = eval('(' + data + ')');
-            console.log("数据：" + data + "\n状态：" + status);
-            drawStackedLine(js, "graphA");
-   	    });
-   	    
-        $.post("/Demo/TimeServlet",
-        		{
-        			"type":"month",   //月份
-        			"starty" :"2014",
-        			"endy" : "2016",
-        			"set" : "0"     //全体
-        	    },
-                    function(data,status){
-        	    	js = eval('(' + data + ')');
-                    console.log("数据：" + data + "\n状态：" + status);
-                    drawRoseGraph(js, "graphB");
-           	    });
-		
-        $.post("/Demo/OtherServlet",                
-        		{
-        			"starty" :"2014",
-        			"endy" : "2016",
-        			"set" : "30022"     //全体
-        	    },
-                    function(data,status){
-        	    	js = eval('(' + data + ')');
-                   // console.log("数据：" + data + "\n状态：" + status);
-                    drawParallelAxis(js,"graphC");
-           	    });
-		//drawParallelAxis([["1","3","16","37","340101"]],"graphC",show)
-		
-		
+		 var year = "2016";
+		 var month = "12";
+		 var lm = "徽州大道";
 		 $.post("/Demo/RoadNetServlet",
         		{
 			 		"type": "road",
-        			"year": "2016",
-        			"month": "12",
-        			"lm": "徽州大道"
+        			"year": year,
+        			"month": month,
+        			"lm": lm
         	    },
                     function(data,status){
         	    	js = eval('(' + data + ')');
-                    console.log("数据：" + data + "\n状态：" + status);
-                    displayRoad(js);
+        	    	js_road = js[0].road;	//道路数据,用于绘制道路
+        	        js_point = js[0].location;	//绝对位置对应的经纬度坐标
+                   // console.log("数据：" + data + "\n状态：" + status);
+                    displayRoad(js_road);
+                    displayIntensityJdwz(js_point);
+                    sgddGeocoder(js_point);
+                    //必须等地址解析完才能调用画图函数    
+                    window.setTimeout(displayIntensitySgdd,3000,js_point);
+                    window.setTimeout(compare,4000,js_point);
+                    window.setTimeout(function(){
+                    	/*
+                    	$.post("/Demo/CoordinateServlet",
+            					{
+            						"data": JSON.stringify(js_point)	//将坐标数据存储到数据库中
+            					},
+            					function(data, status) {
+            						alert(status);
+            					}
+            				);
+                    	*/
+                    	for(var i=0; i<js_point.length; i++) {
+                    		console.log(js_point[i]);
+                    	}
+                    }, 5000);
            	    });
 		
-		/*
+		
+		 /*
 		 $.post("/Demo/RoadNetServlet",
 	        		{
 				 		"type": "xzqh",
@@ -119,10 +123,10 @@
 	        	    },
 	                    function(data,status){
 	        	    	js = eval('(' + data + ')');
-	                    console.log(data);
-	                    // displayXzqh(js);
+	                    //console.log(data);
+	                   // displayXzqh(js);
 	           	    });
-		*/
+		 */
 	
 	</script>
 	
@@ -131,92 +135,6 @@
 	    var map = new BMap.Map("contentD", {enableMapClick:false});
 	    map.centerAndZoom("合肥",15);
 	    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
-	    
-	    function displayXzqh(data) {
-	    	var min = data[0].count;
-	    	var max = data[data.length-1].count;
-	    	var offset = 200; //偏移量
-	    	
-	    	for(var i=0; i<data.length; i++) {
-	    		var xzqhms = data[i].xzqhms;
-	    		//alert(xzqhms);
-	    		var count = data[i].count;
-	    		//根据count大小设置其fillOpacity深浅(归一化到0-1)
-	    		var fill = parseFloat((count - min + offset))/parseFloat((max - min)) * 1.5;
-	    		if(fill > 1) fill = 1.0;
-		        var styleOptions = {
-			            strokeColor:"blue",    //边线颜色。
-			            fillColor:"red",      //填充颜色。当参数为空时，圆形将没有填充效果。
-			            strokeWeight: 2,       //边线的宽度，以像素为单位。
-			            //strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
-			            fillOpacity: fill,      //填充的透明度，取值范围0 - 1。
-			            strokeStyle: 'solid', //边线的样式，solid或dashed。
-			            enableEditing: false
-			        }
-	    		console.log(fill); 
-		      //  if(xzqhms!="市辖区" && xzqhms!="高速")
-		        	getBoundary(xzqhms, styleOptions);	
-	    	}
-	    	map.centerAndZoom("合肥",10);
-	    }
-	    
-		function getBoundary(xzqhms,styleOptions) {       
-			var bdary = new BMap.Boundary();
-			bdary.get("合肥市"+xzqhms, function(rs){       //获取行政区域
-				//map.clearOverlays();        //清除地图覆盖物       
-				var count = rs.boundaries.length; //行政区域的点有多少个
-				if (count === 0) {
-					//alert('未能获取当前输入行政区域');
-					return ;
-				}
-	          	var pointArray = [];
-				for (var i = 0; i < count; i++) {
-					var ply = new BMap.Polygon(rs.boundaries[i], styleOptions); //建立多边形覆盖物
-					map.addOverlay(ply);  //添加覆盖物
-					pointArray = pointArray.concat(ply.getPath());
-				}    
-				//map.setViewport(pointArray);    //调整视野  
-				//addlabel();               
-			});   
-		}
-	    
-	    function displayRoad(data) {
-	    	var overlays = [];
-	        var points = [];
-	        var ld = 0;
-	        for(var i=0; i<data.length; i++) {
-	        	if(data[i].ld == ld) {
-	        		var p = new BMap.Point(data[i].lng, data[i].lat);
-	        		var marker = new BMap.Marker(p);	//添加标注
-	        		map.addOverlay(marker);
-	                points.push(p);	
-	        	}
-	        	else {
-	        		overlays.push(points);
-	        		points = [];
-	        		var p = new BMap.Point(data[i].lng, data[i].lat);
-	        		var marker = new BMap.Marker(p);
-	        		map.addOverlay(marker);
-	                points.push(p);
-	        		ld = ld + 1;
-	        	}
-	        }
-	        overlays.push(points);
-	        console.log(overlays);
-			
-	        var styleOptions = {
-	            strokeColor:"blue",    //边线颜色。
-	            fillColor:"blue",      //填充颜色。当参数为空时，圆形将没有填充效果。
-	            strokeWeight: 6,       //边线的宽度，以像素为单位。
-	            strokeOpacity: 0.6,	   //边线透明度，取值范围0 - 1。
-	            fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
-	            strokeStyle: 'solid', //边线的样式，solid或dashed。
-	            enableEditing: false
-	        }
-	        for(var i=0; i<overlays.length; i++) {
-	        	var polyline = new BMap.Polyline(overlays[i], styleOptions)
-	            map.addOverlay(polyline);	
-	        }
-	    }
+	
 	</script>
 </html>

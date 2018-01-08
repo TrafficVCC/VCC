@@ -27,25 +27,66 @@
 		select * from xzqh;
 	</select> 
 	
-	<!-- tq,cljsg,dcsg,rdyyfl,sgxt,xzqh查询 -->
-	<select id="factorQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap">
-     	select tq, cljsg, dcsg, sgxt, xzqh
+	<!-- 属性查询,动态传入字段名,必须设置为STATEMENT(非预编译) -->
+	<select id="factorQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
+     	select ${attr1}, ${attr2}, count(*) as count
 		from jysg 
-		<![CDATA[ where YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]>  
+		<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>  
 		<if test='set!="0"'>
-			and lh = #{set}
+			and lh = ${set}
 		</if>
+		
+		<if test='content1 == "null"'>
+			and ${attr1} is null
+		</if>
+		<if test='content1 != "0" and content1 != "null"'>
+			and ${attr1} = ${content1}
+		</if>	
+		<if test='content2 == "null"'>
+			and ${attr2} is null
+		</if>
+		<if test='content2 != "0" and content2 != "null"'>
+			and ${attr2} = ${content2}
+		</if>
+		group by ${attr1}, ${attr2}
      </select>
      
-     <select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
-     	select jdwz from jysg
-     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+  	<!-- 支持多选,一个属性同时多个值 -->
+     <select id="factorQuery2" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
+     	select ${attr1}, ${attr2}, count(*) as count
+     	from jysg
+     	<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>
+     	<if test='set!="0"'>
+			and lh = ${set}
+		</if>
+		
+		<if test='content1Array != null and content1Array[0] != "0"'>
+			and ${attr1} in
+			<foreach collection="content1Array" item="item" open="(" close=")" separator=",">
+               ${item}
+            </foreach>
+		</if>
+		
+		<if test='content2Array != null and content2Array[0] != "0"'>
+			and ${attr2} in
+			<foreach collection="content2Array" item="item" open="(" close=")" separator=",">
+               ${item}
+            </foreach>
+		</if>
+		group by ${attr1}, ${attr2}
+		order by ${attr1}, ${attr2}
      </select>
+   
      
-     <select id = "selectRoadNet" parameterType="hashmap" resultType="java.util.LinkedHashMap">
-     	select id, lng, lat, distance
-    	from roadnet
-    	where way = #{lm}
+     <!--  查询各属性对应内容的数量 -->
+     <select id="factorCountQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
+     	select ${attr}, count(*) as count
+     	from jysg
+     	<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>  
+     	<if test='set!="0"'>
+			and lh = ${set}
+		</if>
+		group by ${attr}
      </select>
      
 </mapper>

@@ -20,4 +20,7 @@ public interface TimeMapper {
 	
 	//每年每个星期发生事故数(1~53)
 	public List week2Query(Map params);
+	
+	//测试,当传入的year为数组时
+	public List testMonthQuery(Map params);
 }

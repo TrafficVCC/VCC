@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>简易事故分析</title>
+		<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+		<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+		<script type="text/javascript" src="js/drawStackedLine.js" ></script>
+		<script type="text/javascript" src="js/drawParallelAxis.js" ></script>
+		<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
+		<script type="text/javascript" src="js/jysg_clickFuncs.js" ></script>
+		<script type="text/javascript" src="js/drawYearCal.js" ></script>
+		<script type="text/javascript" src="js/drawMonthLine.js" ></script>
+		<script type="text/javascript" src="js/writeRoadList.js" ></script>
+		<script type="text/javascript" src="js/jysg_start.js" ></script>
+		<script type="text/javascript" src="js/drawCountOnRoad.js" ></script>
+		
+		
+		<!--加载百度地图API库-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	<script src="http://mapv.baidu.com/build/mapv.min.js"></script>	
+    	<script src="js/drawMap.js"></script>
+    	<!--加载鼠标绘制工具-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+
+		
+		<link rel="stylesheet" href="css/content_jysg.css" />
+		<style type="text/css">
+        /*去除地图左下方baidu logo*/
+        .BMap_cpyCtrl {display: none;}
+        .anchorBL {display: none;}
+    	</style>
+    	
+	</head>
+	
+	<body>
+		<div id="content">
+			
+		<div id="contentA">
+			<svg id="graphA1" width="600" height="300"></svg>
+			<svg id="graphA2" width="600" height="300"></svg>
+			<!--<div id="contentA1">
+				<svg id="graphA1" width="600" height="300"></svg>
+			</div>
+			<div id="contentA2">
+				<svg id="graphA2" width="600" height="300"></svg>
+			</div>-->
+			<button id="btnA1" onclick="clickbtnA1()">1</button>
+			<button id="btnA2" onclick="clickbtnA2()">2</button>
+			<button id="btnA3" onclick="clickbtnA3()">显示</button>
+			<button id="btnA4" onclick="clickbtnA4()">重置</button>
+		</div>
+
+		
+		<div id="contentB">
+			<svg id="graphB" width="600" height="300"></svg>
+			<button id="btnB1" onclick="clickbtnB1()" >锁定</button>
+		</div>
+		
+		<div id="contentC">
+			<svg id="graphC" width="600" height="700"></svg>
+		</div>
+		
+		<div id="contentD">
+		</div>
+		
+		<div id="contentE">
+			<svg id="graphE" width="1200" height="400"></svg>
+		</div>
+		
+		</div>
+	</body>
+
+	<script src="js/jysgAnalyze.js" ></script>
+	
+	<script>
+		
+	$.post("/Demo/RoadNetServlet",
+     		{
+			    "type": "sgdd",
+     			"year": "2016",
+     			"month": "12",
+     			"lm": "徽州大道"
+     	    },
+                 function(data,status){
+     	    	js = eval('(' + data + ')');
+     	    	js_road = js[0].road;	//道路数据,用于绘制道路
+     	        js_point = js[0].location;	//绝对位置对应的经纬度坐标
+                // console.log("数据：" + data + "\n状态：" + status);
+                 displayRoad(js_road);
+                 sgddGeocoder(js_point);
+                 //必须等地址解析完才能调用画图函数
+                 window.setTimeout(displayIntensity,3000,js_point);
+        	    });
+		
+	</script>
+	
+	<script>
+		//创建地图
+	    var map = new BMap.Map("contentD", {enableMapClick:false});
+	    map.centerAndZoom("合肥",15);
+	    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+	    
+	</script>
+</html>

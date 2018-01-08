@@ -88,6 +88,9 @@ public class RoadServlet extends HttpServlet {
 		else if(type.equals("jdwz")) {
 			li = road.roadjdwzQuery(params);
 		}
+		else if(type.equals("jysg_jdwz")) {
+			li = road.selectjdwz(params);
+		}
 		else if(type.equals("interval")) {
 			li = road.intervalQuery(params);
 		}

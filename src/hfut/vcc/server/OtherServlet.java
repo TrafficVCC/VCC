@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,9 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.session.SqlSession;
 import org.json.*;
+import com.google.gson.*;
 
 import hfut.vcc.mapping.OtherMapper;
 import hfut.vcc.util.MyBatisUtil;
+import hfut.vcc.util.MySqlUtil;
 
 /**
  * Servlet implementation class OtherServlet
@@ -39,17 +42,41 @@ public class OtherServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		String type = request.getParameter("type");
 		String starty = request.getParameter("starty");
 		String endy = request.getParameter("endy");
 		String set = request.getParameter("set");
-		Map<String,String> params = new HashMap<String,String>();
+	    String[] attr = request.getParameterValues("attr[]");
+	    String[] content = request.getParameterValues("content[]");
+	    
+	    List<String[]> contentArray = new ArrayList<String[]>();
+	    for(int i=0; i<content.length; i++) {
+	    	String[] temp = null;
+	    	if(content[i].length()!=0) {
+	    		temp = content[i].split("/");
+	    	}
+	    	else {
+	    		temp = new String[0];
+	    	}
+	    	contentArray.add(temp);
+	    	System.out.println(temp.length);
+	    }
+	    
+		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("starty", starty);
 		params.put("endy", endy);
 		params.put("set", set);
+		params.put("attr", attr);
+		params.put("contentArray", contentArray);
 		
-		JSONArray js = new JSONArray();
+		String js = new String();
 		try {
-			js = getJSONData(params);
+			if(type.equals("factor")) {
+				js = getFactor(params);
+			}
+			else if(type.equals("factorCount")) {
+				js = getFactorCount(params);
+			}
 		}
 		catch(JSONException e) {
 			e.printStackTrace();
@@ -57,7 +84,7 @@ public class OtherServlet extends HttpServlet {
 		
 		System.out.println(js);
 		PrintWriter out = response.getWriter();
-		out.print(js.toString());
+		out.print(js);
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
@@ -69,24 +96,64 @@ public class OtherServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONArray getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
+	private String getFactor(Map<String,Object> params) throws JSONException, IllegalArgumentException {
 		SqlSession session = MyBatisUtil.getSqlSession();
 		OtherMapper other = session.getMapper(OtherMapper.class);
 		
-		List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
-		li = other.factorQuery(params);
+		List<Object> json = new ArrayList<Object>();
+		String[] attr = (String[])params.get("attr");
+		List<String[]> contentArray = (List<String[]>)params.get("contentArray");
 		
-		JSONArray json = new JSONArray();
-		for(Map<String,Object> map: li) {
-			JSONArray arr = new JSONArray();
-			for(Map.Entry<String, Object> entry: map.entrySet()) {
-				String key = entry.getKey();
-				Object value = entry.getValue();
-				arr.put(value);
-			}
-			json.put(arr);
+		//还是用Gson解析方便
+		Gson gson = new GsonBuilder()	//使用GsonBuilder结果中会包含null的字段
+		        .serializeNulls()
+		        .create();	
+		
+		//每相邻两个属性之间进行查询
+		for(int i=0; i<attr.length-1; i++) {
+			Map<String,Object> pa = new LinkedHashMap<String,Object>();
+			pa.put("starty", (String)params.get("starty"));
+			pa.put("endy", (String)params.get("endy"));
+			pa.put("set", (String)params.get("set"));
+			pa.put("attr1", attr[i]);
+			pa.put("attr2", attr[i+1]);
+			pa.put("content1Array", (String[])contentArray.get(i));
+			pa.put("content2Array", (String[])contentArray.get(i+1));
+			
+			List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
+			li = other.factorQuery2(pa);
+			
+			//System.out.println(gson.toJson(li));
+			json.add(li);
 		}
-		return json;
+		//System.out.println(gson.toJson(json));
+		return gson.toJson(json);
+	}
+	
+	private String getFactorCount(Map<String,Object> params) throws JSONException, IllegalArgumentException {
+		SqlSession session = MyBatisUtil.getSqlSession();
+		OtherMapper other = session.getMapper(OtherMapper.class);
+		
+		List<Object> json = new ArrayList<Object>();
+		String[] attr = (String[])params.get("attr");
+		
+		//还是用Gson解析方便
+				Gson gson = new GsonBuilder()	//使用GsonBuilder结果中会包含null的字段
+				        .serializeNulls()
+				        .create();	
+				
+		for(int i=0; i<attr.length; i++) {
+			Map<String,Object> pa = new LinkedHashMap<String,Object>();
+			pa.put("starty", (String)params.get("starty"));
+			pa.put("endy", (String)params.get("endy"));
+			pa.put("set", (String)params.get("set"));
+			pa.put("attr", attr[i]);
+			
+			List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
+			li = other.factorCountQuery(pa);
+			json.add(li);
+		}	
+		return gson.toJson(json);
 	}
 
 }

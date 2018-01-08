@@ -12,6 +12,65 @@ div#contentA{
 	/*background-color: #40AFFE;*/
 	border:1px solid #2E2D3C;
 }
+
+svg#graphA1{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	display: block;
+
+	z-index: 0;
+}
+svg#graphA2{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	display: none;
+	z-index: 0;
+}
+
+/*div#contentA1{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	display: block;
+	background-color: bisque;
+}
+div#contentA2
+{
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	display: none;
+	background-color: chartreuse;
+}*/
+
+button#btnA1{
+	position: absolute;
+	right: 10px;
+	top: 20px;
+	z-index: 1;
+}
+button#btnA2{
+	position: absolute;
+	right: 10px;
+	top: 45px;
+	z-index: 1;
+}
+button#btnA3{
+	position: absolute;
+	right: 10px;
+	top: 70px;
+	z-index: 1;
+}
+button#btnA4{
+	position: absolute;
+	right: 10px;
+	top: 120px;
+	z-index: 1;
+}
+
+
 div#contentB{
 	width: 600px;
 	height: 300px;
@@ -20,7 +79,15 @@ div#contentB{
 	top: 300px;
 	/*background-color: aquamarine;*/
 	border:1px solid #2E2D3C;
+	z-index: 0;
 }
+button#btnB1{
+	position: absolute;
+	right: 10px;
+	top: 55px;
+	z-index: 1;
+}
+
 div#contentC{
 	width: 600px;
 	height: 400px;
@@ -29,6 +96,7 @@ div#contentC{
 	top: 600px;
 	/*background-color: bisque;*/
 	border:1px solid #2E2D3C;
+	overflow-y:auto;
 	
 }
 div#contentD{
@@ -49,16 +117,50 @@ div#contentE{
 	top: 600px;
 	/*background-color: hotpink;*/
 	border:1px solid #2E2D3C;
+	overflow-y:auto;
 }
 
-.axis path,
+/*.axis path,
 .axis line{  
     fill: none;  
     stroke: black;  
     stroke-width: 1;
-    /*shape-rendering: crispEdges;*/  
+
 }
 
 .label text{
 	font-size: 10px;
-}
+}*/
+
+	svg {
+	  font: 10px sans-serif;
+	}
+	
+	.background path {
+	  fill: none;
+	  stroke: #ddd;
+	  shape-rendering: crispEdges;
+	}
+	
+	.foreground path {
+	  fill: none;
+	  stroke: steelblue;
+	}
+	
+	.brush .extent {
+	  fill-opacity: .3;
+	  stroke: #fff;
+	  shape-rendering: crispEdges;
+	}
+	
+	.axis line,
+	.axis path {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+	
+	.axis text {
+	  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+	  cursor: move;
+	}

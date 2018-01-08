@@ -19,11 +19,14 @@
     	select id, ld, lng, lat, distance
     	from roadnet
     	where way = #{way}
+    	order by distance
     </select>
 	
 	<select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
-     	select jdwz from jysg
+     	select lm, sgdd, jdwz, count(*) as count from jysg
      	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     	group by jdwz, sgdd
+     	order by count
      </select>
      
      <select id = "selectxzqh" parameterType="hashmap" resultType="hashmap">
@@ -32,6 +35,14 @@
      	where YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
      	group by xzqh, xzqhms
 		ORDER BY count
+     </select>
+     
+     <select id="selectsgdd" parameterType="hashmap" resultType="hashmap">
+     	select sgdd, jdwz, count(*) as count
+     	from jysg
+     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     	group by sgdd,jdwz
+     	order by count
      </select>
 	
 </mapper>
