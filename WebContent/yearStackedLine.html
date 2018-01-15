@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+<script type="text/javascript" src="js/drawStackedLine.js" ></script>
+<script type="text/javascript" src="js/drawLineByYear.js" ></script>
+<script type="text/javascript" src="js/jysg_clickFuncs.js" ></script>
+
+
+
+<link rel="stylesheet" href="css/content_jysg.css" />
+<style type="text/css">
+</style>
+</head>
+<body>
+	<div id="content">
+			
+		<div id="contentA">
+			<svg id="graphA1" width="600" height="300"></svg>
+			<svg id="graphA2" width="600" height="300"></svg>
+			
+			<button id="btnA1" onclick="clickbtnA1()">1</button>
+			<button id="btnA2" onclick="clickbtnA2()">2</button>
+			<button id="btnA3" onclick="clickbtnA3()">显示</button>
+			<button id="btnA4" onclick="clickbtnA4()">重置</button>
+		</div>
+		
+	</div>
+</body>
+
+<script>
+//全局变量
+window.years = ["2014","2015","2016"];
+window.months = "0";
+window.originYears = ["2014","2015","2016"];
+window.originRoads = "0";
+window.yflags = [0,0,0];
+window.roads = "0";
+window.tempRoad = "0";
+window.lockedFlag = 0;	//判定道路是否锁定
+
+//contentA
+$.post("/Demo/TimeServlet",
+{
+	"type":"month",   //月份
+	"starty" : window.originYears[0],
+	"endy" : window.originYears[originYears.length-1],
+	"set" : window.roads     //全体
+},
+function(data,status){
+    js = eval('(' + data + ')');
+    console.log("数据：" + data + "\n状态：" + status);
+    console.log("绘制堆栈图");
+    console.log("年份"+window.years);
+    console.log("道路"+window.roads);
+    drawStackedLine(js, "graphA1", clickStackArea, window.yflags);
+});
+
+</script>
+</html>

@@ -44,22 +44,25 @@ public class RoadServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		String type = request.getParameter("type");
+		String[] year = request.getParameterValues("year[]");	//һ��ע���ȡǰ������ʱҪ���ֶκ����[]
+		String[] month = request.getParameterValues("month[]");
+		String[] lm = request.getParameterValues("lm[]");
 		
-		Map<String,String> params = new HashMap<String,String>();
-		//获取所有参数集合(由于不确定前端传来的有哪些参数，所以需获取其所有参数)
-        Map<String, String[]> parameterMap=request.getParameterMap();  
-        for(String key : parameterMap.keySet()){  
-            params.put(key, parameterMap.get(key)[0]);
-        }  
-        
-    	JSONArray js = new JSONArray();
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("year", (String[])year);
+		params.put("month", (String[])month);
+		params.put("lm", (String[])lm);
+		
+		JSONArray js = new JSONArray();
 		try {
 			js = getJSONData(params);
-		}
-		catch(JSONException e) {
+			
+		} catch(JSONException e) {
 			e.printStackTrace();
 		}
 		
+		response.setContentType("text/html;charset=utf-8");  //解决前端中文乱码
 		System.out.println(js);
 		PrintWriter out = response.getWriter();
 		out.print(js.toString());
@@ -75,28 +78,13 @@ public class RoadServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONArray getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
+	private JSONArray getJSONData(Map<String,Object> params) throws JSONException, IllegalArgumentException {
 		
 		SqlSession session = MyBatisUtil.getSqlSession();
 		RoadMapper road = session.getMapper(RoadMapper.class);
 		
 		List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
-		String type = params.get("type");
-		if(type.equals("lh")) {
-			li = road.roadlhQuery(params);
-		}
-		else if(type.equals("jdwz")) {
-			li = road.roadjdwzQuery(params);
-		}
-		else if(type.equals("jysg_jdwz")) {
-			li = road.selectjdwz(params);
-		}
-		else if(type.equals("interval")) {
-			li = road.intervalQuery(params);
-		}
-		else {
-			throw new IllegalArgumentException ("Invalid type");
-		}
+		li = road.selectRoad(params);
 		
 		JSONArray js = MySqlUtil.listToJSON(li);
 		session.close();

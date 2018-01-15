@@ -40,22 +40,21 @@ public class MySqlUtil {
 	}
 	
 	/*鍚堝苟鍏锋湁鐩稿悓key鍊肩殑(鐩稿悓骞翠唤鍚堝苟鍒颁竴涓猚ount鏁扮粍涓�),鏃犺褰曡ˉ0*/
-	public static JSONArray combineJSON(JSONArray array,Map<String,String> params) 
+	public static JSONArray combineJSON(JSONArray array,Map<String,Object> params) 
 			throws JSONException,IndexOutOfBoundsException {
-		String starty = params.get("starty");
-		String endy = params.get("endy");
-		String type = params.get("type");
+		String[] year = (String[])params.get("year");
+		String type = (String)params.get("type");
 		JSONArray result = new JSONArray();
 		//娉�:HashMap鍐呴儴鏄棤搴忕殑,搴旂敤LinkedHashMap
 		Map<Object, List> map = new LinkedHashMap<>();
 		int num = typeTonum.get(type);
 		//鍒濆鍖杕ap,count閲屾牴鎹被鍨嬪～鍏�0
-		for(int i=Integer.parseInt(starty); i<=Integer.parseInt(endy);i++) {
+		for(String s: year) {
 			List li = new ArrayList<>();
 			for(int j=0; j<num; j++) {
 				li.add(0);
 			}
-			map.put(i, li);
+			map.put(Integer.parseInt(s), li);
 		}
 		
 		for(int i=0; i<array.length(); i++) {

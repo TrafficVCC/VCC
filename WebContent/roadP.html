@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Scratch Paper</title>
+		<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+		<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+		
+		<script type="text/javascript" src="js/drawRoadP.js" ></script>
+		<script type="text/javascript" src="js/echarts.js" ></script>
+
+		
+
+	</head>
+	<style type="text/css">
+
+		div#graph{
+				width: 1000px;
+				height: 500px;
+				/*position: absolute;
+				left: 0px;
+				top: 0px;*/
+				/*background-color: #40AFFE;*/
+				border:1px solid #2E2D3C;
+				overflow-y:auto;
+		}
+	</style>
+	<style>
+	
+	
+	</style>
+	<body>
+		<div>
+			<div id="graph" width="1000" height="500">
+		
+			
+			</div>
+		
+		</div>
+		<script>
+		var year = ["2014","2015","2016"];
+		var month = ["0"];
+		var lm = ["徽州大道","马鞍山路","芜湖路","黄山路","怀宁路","休宁路","金寨路","九华山路"];
+		$.post("/Demo/RoadServlet",
+			{
+		 		"type": "lm",
+				"year[]": year,
+				"month[]": month,
+				"lm[]": lm
+		    },
+	         function(data,status){
+		    	js = eval('(' + data + ')');
+	            alert(status);
+	            
+				drawRoadP(js, 'graph', show, lm);
+	  	    });
+		
+		
+		function show(){};
+		
+		 //修改数据
+     /*	var a = echarts.getInstanceByDom(document.getElementById('graph'));
+       	a.setOption({
+       		legend:{
+       			data:roads
+       		},
+       		series :[{
+       			data:
+       		}]
+       	})
+		*/
+		
+		
+		</script>
+	</body>
+</html>

@@ -33,6 +33,8 @@
    	  <mapper class = "hfut.vcc.mapping.OtherMapper"/>
    	  <mapper class = "hfut.vcc.mapping.CoordinateMapper"/>
    	  <mapper class = "hfut.vcc.mapping.TestMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.RoadFittingMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.DfldMapper"/>
    </mappers>
    
 </configuration>

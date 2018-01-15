@@ -43,9 +43,9 @@ public class OtherServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String type = request.getParameter("type");
-		String starty = request.getParameter("starty");
-		String endy = request.getParameter("endy");
-		String set = request.getParameter("set");
+		String[] year = request.getParameterValues("year[]");
+		String[] set = request.getParameterValues("set[]");
+		System.out.println("lm "+set);
 	    String[] attr = request.getParameterValues("attr[]");
 	    String[] content = request.getParameterValues("content[]");
 	    
@@ -59,12 +59,10 @@ public class OtherServlet extends HttpServlet {
 	    		temp = new String[0];
 	    	}
 	    	contentArray.add(temp);
-	    	System.out.println(temp.length);
 	    }
 	    
 		Map<String,Object> params = new HashMap<String,Object>();
-		params.put("starty", starty);
-		params.put("endy", endy);
+		params.put("year", year);
 		params.put("set", set);
 		params.put("attr", attr);
 		params.put("contentArray", contentArray);
@@ -109,12 +107,20 @@ public class OtherServlet extends HttpServlet {
 		        .serializeNulls()
 		        .create();	
 		
+		Map<String,Object> pa = new LinkedHashMap<String,Object>();
+		List<Map<String,Object>> list = new ArrayList<>();		
+		pa.put("year", (String[])params.get("year"));
+		pa.put("set", (String[])params.get("set"));
+		for(int i=0; i<attr.length; i++) {
+			Map<String,Object> temp = new LinkedHashMap<String,Object>();
+			temp.put("attr", attr[i]);
+			temp.put("content", (String[])contentArray.get(i));
+			list.add(temp);
+		}
+		pa.put("allAttr",list);		//将所有的需要进行条件判断的属性存在List里
+		
 		//每相邻两个属性之间进行查询
 		for(int i=0; i<attr.length-1; i++) {
-			Map<String,Object> pa = new LinkedHashMap<String,Object>();
-			pa.put("starty", (String)params.get("starty"));
-			pa.put("endy", (String)params.get("endy"));
-			pa.put("set", (String)params.get("set"));
 			pa.put("attr1", attr[i]);
 			pa.put("attr2", attr[i+1]);
 			pa.put("content1Array", (String[])contentArray.get(i));
@@ -144,8 +150,7 @@ public class OtherServlet extends HttpServlet {
 				
 		for(int i=0; i<attr.length; i++) {
 			Map<String,Object> pa = new LinkedHashMap<String,Object>();
-			pa.put("starty", (String)params.get("starty"));
-			pa.put("endy", (String)params.get("endy"));
+			pa.put("year", (String[])params.get("year"));
 			pa.put("set", (String)params.get("set"));
 			pa.put("attr", attr[i]);
 			

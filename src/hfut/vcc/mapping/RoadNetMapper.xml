@@ -23,10 +23,22 @@
     </select>
 	
 	<select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
-     	select lm, sgdd, jdwz, count(*) as count from jysg
-     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
-     	group by jdwz, sgdd
-     	order by count
+     	select lm, jdwz, count(*) as count from jysg
+     	where lm = #{lm} 
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+     	group by jdwz
+     	order by jdwz
      </select>
      
      <select id = "selectxzqh" parameterType="hashmap" resultType="hashmap">
@@ -43,6 +55,27 @@
      	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
      	group by sgdd,jdwz
      	order by count
+     </select>
+     
+     <!-- 查询jdwz的经纬度坐标-->
+     <select id = "selectCoor" parameterType="hashmap" resultType="hashmap">
+     	select jdwz, lng_jdwz, lat_jdwz, count(*) as count 
+     	from jysg
+     	where lm = #{lm} 
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+     	group by jdwz, lng_jdwz, lat_jdwz
+     	order by jdwz
      </select>
 	
 </mapper>

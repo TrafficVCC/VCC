@@ -1,58 +1,133 @@
-function jysg_start(){
+
+function show(){
 	
-	//全局变量
-	window.years = ["2014","2015","2016"];
-	window.months = "0";
-	window.originYears = ["2014","2015","2016"];
-	window.originRoads = "0";
-	window.yflags = [0,0,0];
-	window.roads = "0";
-	window.tempRoad = "0";
-	window.lockedFlag = 0;	//判定道路是否锁定
+}
+function saveServie()
+{
+	alert(1);
+	 $.post("/Demo/SaveDfldServlet",
+	{
+		"lm": window.road,
+		"hotdata": window.hotdata
+	},
+   		function(data,status){
+	    	if(data == 0)
+	    	{
+	    		alert(0);
+	    	}
+   		});
+}
+function confirm()
+{
+	var t = $("#threodput").val();
 	
-	//contentA
+	if(t=="")
+	{
+		alert("请输入阈值");
+		return;
+	}
+
+	 var dataList = findhot(option.series[0].data,t);
+	 $.post("/Demo/DfldServlet",
+		{
+			"lm": window.road,
+			"data[]": dataList
+		},
+	   		function(data,status){
+		    	js = eval('(' + data + ')');
+		    	window.hotdata= data;
+		    	var js_road = js[0].road;
+		    	
+		    	displayIntensityJdwz([]);
+		    	displayRoad(js_road);
+		    	
+		    	var js_dfld = js[0].dfld;
+		    	displayDfld(js_dfld);
+		   	 	console.log(js);
+		   	 	$('#saveButton').removeAttr("disabled").removeClass("layui-btn-disabled");
+	   		});
+	
+}
+function updatecontentA()
+{
 	$.post("/Demo/TimeServlet",
-	{
-		"type":"month",   //月份
-		"starty" : window.originYears[0],
-		"endy" : window.originYears[originYears.length-1],
-		"set" : window.roads     //全体
-	},
-	function(data,status){
-	    js = eval('(' + data + ')');
-	    console.log("数据：" + data + "\n状态：" + status);
-	    console.log("绘制堆栈图");
-	    console.log("年份"+window.years);
-	    console.log("道路"+window.roads);
-	    drawStackedLine(js, "graphA1", clickStackArea, window.yflags);
-	});
-	
-	//contentB
+			{
+				"type":"month",   //月份
+				"year[]": window.years,
+				"set[]" : window.roadList     //全体
+			},
+			function(data,status){
+			    js = eval('(' + data + ')');
+			    drawStackedLine(js, "graphA1", clickStackArea);
+			});
+}
+function updatecontentB()
+{
 	$.post("/Demo/RoadServlet",
-	{
-		"type":"lh",   //路号
-		"starty" :window.years[0],
-		"endy" : window.years[window.years.length-1],
-		"set" : "0"     //全体
-	},
-	function(data,status){
-		js = eval('(' + data + ')');
-		var lh_dataset = [];
-		for(i=0; i<10; i++){
-			lh_dataset.push(js[i]);
-		}
-		console.log(lh_dataset);
-	    console.log("绘制list");
-	    console.log("年份"+window.years);
-	    console.log("道路"+window.roads);
-		writeRoadList(lh_dataset, "graphB", clickList);
-		
+			{
+		 		"type":"lm",
+				"year[]":  window.years,
+				"month[]": window.months,
+				"lm[]": window.originRoads
+		    },
+		     function(data,status){
+		    	js = eval('(' + data + ')');
+				drawRoadP(js, 'contentB', clickPie, window.originRoads);
+		    });
+}
+function updatecontentC()
+{
+	$.post("/Demo/OtherServlet",
+			{
+				"type":"factor",   //属性
+			    "year[]": window.years,
+				"set[]" : window.roadList,    //全体
+				"attr[]": window.attrs,		//js会将attr转换成attr[],所以最好直接写成attr[]
+				"content[]": window.attrFlag
+			},
+			    function(data,status){
+				js = eval('(' + data + ')');
+				drawAG(js, "graphC", clickAttrRect);
+			});
 	
-	});
-	
-	//contentC
-	
-	
-	//contentE
-	
+}
+function updatecontentD()
+{
+	 $.post("/Demo/RoadNetServlet",
+		   		{
+				 	"type": "coor",
+		   			"year": window.years,
+		   			"month": window.months ,
+		   			"lm": window.road
+		   	    },
+		               function(data,status){
+		   	    	js = eval('(' + data + ')');
+		   	    	js_road = js[0].road;	//道路数据,用于绘制道路
+		   	        js_point = js[0].location;	//绝对位置对应的经纬度坐标
+		               displayRoad(js_road);
+		               displayIntensityJdwz(js_point);
+		      	    });
+}
+function updatecontentE()
+{
+	 $.post("/Demo/RoadFittingServlet",
+				{
+					"type":"road_fitting",  
+					"year[]": window.years,		//最好一定加上[]
+					"month[]": window.months,
+					"lm": window.road
+			    },
+		        function(data,status){
+		    	 js= eval('(' + data + ')');
+		    	 drawRoadA(js, 'main', show, window.roadList);
+		    });
+
+}
+
+function jysg_start(){
+	updatecontentA();
+	updatecontentB();
+	updatecontentC();
+	updatecontentD();
+	updatecontentE();
 }

@@ -151,13 +151,13 @@
 	    	var dataSet = new mapv.DataSet(points);
 	        var options = {
 	        		zIndex: 1, // 层级
-	        		size: 8,
+	        		size: 3,
 	                gradient: {
-//	                    0: '#FFECEC',
-//	                    0.2: '#FFB5B5',
-//	                    0.4: '#FF7575',
-//	                    0.6: '#FF2D2D',
-//	                    0.8: '#EA0000',
+	                    0: '#FFECEC',
+	                    0.2: '#FFB5B5',
+	                    0.4: '#FF7575',
+	                    0.6: '#FF2D2D',
+	                    0.8: '#EA0000',
 	                    1.0: '#AE0000'
 	                },
 	                max: 100,
@@ -195,11 +195,11 @@
 	        		zIndex: 1, // 层级
 	        		size: 8,
 	                gradient: {
-//	                    0: '#FFF7FF	',
-//	                    0.2: '#FFD0FF',
-//	                    0.4: '#ffa6ff',
-//	                    0.6: '#FF77FF',
-//	                    0.8: '#FF00FF',
+	                    0: '#FFF7FF	',
+	                    0.2: '#FFD0FF',
+	                    0.4: '#ffa6ff',
+	                    0.6: '#FF77FF',
+	                    0.8: '#FF00FF',
 	                    1.0: '#D200D2'
 	                },
 	                max: 100,

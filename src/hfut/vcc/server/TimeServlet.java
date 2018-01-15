@@ -45,14 +45,13 @@ public class TimeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String type = request.getParameter("type");
-		String starty = request.getParameter("starty");
-		String endy = request.getParameter("endy");
-		String set = request.getParameter("set"); 
-		Map<String,String> params = new HashMap<String,String>();
+		String[] year = request.getParameterValues("year[]");
+		String[] set = request.getParameterValues("set[]"); 
+		System.out.println("lm " + set);
+		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("type", type);
-		params.put("starty", starty);
-		params.put("endy", endy);
-		params.put("set", set);
+		params.put("year", (String[])year);
+		params.put("set", (String[])set);
 		
 		JSONArray js = new JSONArray();
 		try {
@@ -77,27 +76,18 @@ public class TimeServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private JSONArray getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
+	private JSONArray getJSONData(Map<String,Object> params) throws JSONException, IllegalArgumentException {
 		
 		SqlSession session = MyBatisUtil.getSqlSession();
 		TimeMapper time = session.getMapper(TimeMapper.class);
 		
 		List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
-		String type = params.get("type");
+		String type = (String)params.get("type");
 		if(type.equals("year")) {
 			li =  time.yearQuery(params);
 		}
 		else if(type.equals("month")) {
 			li = time.monthQuery(params);
-		}
-		else if(type.equals("week")) {
-			li = time.weekQuery(params);
-		}
-		else if(type.equals("quarter")) {
-			li = time.quarterQuery(params);
-		}
-		else {
-			throw new IllegalArgumentException ("Invalid type");
 		}
 		
 		JSONArray js = MySqlUtil.listToJSON(li);

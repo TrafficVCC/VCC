@@ -2,44 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="hfut.vcc.mapping.RoadMapper">
-
-	<select id="roadlhQuery" parameterType="hashmap" resultType="hashmap">
-		select lh , count(*) as count
-		from jysg
-		where lh is not null and
-		<![CDATA[ YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]> 
-		<if test='set!="0"'>
-			and lh = #{set}
+	
+	 <select id = "selectRoad" parameterType="hashmap" resultType="hashmap">
+     	select lm as name, count(*) as value 
+     	from jysg
+     	where lm in
+     	<foreach collection="lm" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
 		</if>
-		group by lh
-		order by count desc
-	</select>
-	
-	<select id="roadjdwzQuery" parameterType="hashmap" resultType="hashmap">
-		SELECT lh, jdwz, (TO_DAYS(DATE(sgfssj))-TO_DAYS('2006-01-01')) as time
-		FROM ybsg1
-		where lh = #{set} AND jdwz IS NOT NULL AND sgfssj IS NOT NULL and
-		<![CDATA[ YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]> 
-		ORDER BY jdwz
-	</select>
-	
-	<select id="intervalQuery" parameterType="hashmap" resultType="hashmap">
-	    SELECT A.id, A.diff from (
-	 	SELECT @id:=@id+1 as id,lh,DATE(sgfssj) as time,DATEDIFF(DATE(sgfssj),@prev_time) as diff, (@prev_time:=DATE(sgfssj))
-		FROM (SELECT lh,sgfssj from ybsg1 WHERE lh= #{set} ORDER BY sgfssj) as T, (SELECT @id:=0) as B, (SELECT @prev_time:='2016-01-01') as C ) as A 
-		<![CDATA[ WHERE diff >= 0 ]]> 
-	</select>
-	
-	<select id="selectjdwz" parameterType="hashmap" resultType="hashmap">
-		select jdwz, count(*) as count
-		from jysg
-		where lh is not null and
-		<![CDATA[ YEAR(sgfssj) >= #{starty} and YEAR(sgfssj) <= #{endy} ]]> 
-		<if test='set!="0"'>
-			and lh = #{set}
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item3" open="(" close=")" separator=",">
+               	#{item3}
+            </foreach>
 		</if>
-		group by jdwz
-		order by count
-	</select>
+     	group by name
+     	order by value
+     </select>
 
 </mapper>

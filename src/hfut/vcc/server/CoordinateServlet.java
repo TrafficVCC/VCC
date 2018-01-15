@@ -45,14 +45,19 @@ public class CoordinateServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String data = request.getParameter("data");
+		String lm = request.getParameter("lm");
 		System.out.println(data);
 		
 		try {
+			Map<String,Object> params = new HashMap<String,Object>();
 			RoadCoor[] array = new Gson().fromJson(data,RoadCoor[].class);
 			List<RoadCoor> list = Arrays.asList(array);
+			params.put("lm", lm);
+			params.put("data", (List)list);
+			
 			SqlSession session = MyBatisUtil.getSqlSession();
 			CoordinateMapper coor = session.getMapper(CoordinateMapper.class);
-			coor.updateCoorBatch(list);	//批量更新
+			coor.updateCoorBatch(params);	//批量更新
 			session.commit();
 			session.close();
 			
