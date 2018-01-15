@@ -1,6 +1,7 @@
-//data:[{"year":d, "count":[d1, d2, …, …]}, {…, …}, …… ]
+//data:[{"year":d, "count":[d1, d2, …, …]}, …… ]
 //svgId:
-//func:
+//func:点击扇形触发的函数. 
+//func(d). d.value:事故数量, d.ring:每个环代表内容, d.num:每个环中的第几瓣, d.piece:每个环有多少瓣(4代表季度, 12代表月份, 7代表星期)。
 
 //画玫瑰图
 function drawRoseGraph(data, svgId, func){
@@ -9,14 +10,16 @@ function drawRoseGraph(data, svgId, func){
 	data.forEach(function(d){
 		dataset.push([d.year, d.count]);
 	});
-	console.log(dataset);
+//	console.log(dataset);
+	
 	//提取svg的宽度长度
 	var width = d3.select("#"+svgId).attr("width");
 	var height = d3.select("#"+svgId).attr("height");
-	//alert(width, height);
-	
 	//边缘
-	var padding = {top:(height/20), right:(width/20), bottom:(height/20), left:(width/20) };
+	var padding = width/20;
+	
+	width = width - padding*2;
+	height = height - padding*2;
 	
 	//求最大最小值
 	var getmax = function(a){
@@ -33,24 +36,11 @@ function drawRoseGraph(data, svgId, func){
 	    }
 	    return min;
 	}
-	var maxs = [];
-	var mins = [];
-	dataset.forEach(function(d){
-        maxs.push(getmax(d[1]));
-        mins.push(getmin(d[1]));
-   	})
-	var max,min;
-    max = getmax(maxs);
-    min = getmin(mins);
 	
     //颜色比例尺
     var color1 = d3.rgb(255,250,250);
     var color2 = d3.rgb(175,0,0);
-	var linear = d3.scale.linear()  
-        .domain([min,max])  
-        .range([0,1]);
-    var compute = d3.interpolate(color1,color2);  
-	
+
 	//根据count数组长度确定要画的瓣数
 	var piece = dataset[0][1].length;
 	//角度数组
@@ -71,11 +61,19 @@ function drawRoseGraph(data, svgId, func){
     //循环画图
     for(var j=0; j<dataset.length; j++){
     	//给piedata赋值
-//  	var piedata = [];
+    	var max = getmax(dataset[j][1]);
+    	var min = getmin(dataset[j][1]);
+    	var linear = d3.scale.linear()  
+	        .domain([min,max])
+	        .range([0,1]);
+	    var compute = d3.interpolate(color1,color2);  
     	for(var i=0; i<piece; i++){
-            piedata.push({"outerRadius":[(height/3)/dataset.length]*(j+1)+j,"innerRadius":[(height/3)/dataset.length]*j+j,
-            	"startAngle":angles[i], "endAngle":angles[i+1], "padAngle":0, 
-            	"value":dataset[j][1][i], "time":[dataset[j][0],i+1], "type":[piece, i+1]});
+    		var c = compute(linear(dataset[j][1][i]));
+            piedata.push({
+            	"outerRadius":[(height/3)/dataset.length]*(j+1)+j, "innerRadius":[(height/3)/dataset.length]*j+j,
+            	"startAngle":angles[i],	"endAngle":angles[i+1], "padAngle":0, 
+            	"color":c,
+            	"value":dataset[j][1][i], "ring":dataset[j][0], "num":i+1, "type":piece});
         }
     }
     
@@ -86,16 +84,15 @@ function drawRoseGraph(data, svgId, func){
     	return a(d);
     }
     	
-        var g = s.selectAll("g");
-        var updateG = g.data(piedata);
-        var enterG = updateG.enter();
-        var exitG = updateG.exit();
-//      exitG.remove();
-        
-        var updateA = updateG.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
+    var g = s.selectAll(".arc");
+    var updateG = g.data(piedata);
+    var enterG = updateG.enter();
+    var exitG = updateG.exit();
+    exitG.remove();
+    var updateA = updateG.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
         updateA.selectAll("path")  
-	        .attr("fill",function(d,i){  
-	            return compute(linear(d.value));
+	        .attr("fill",function(d,i){
+	            return d.color;
 	        })  
 	        .attr("d",function(d){  
 	            return arc(d);
@@ -107,35 +104,73 @@ function drawRoseGraph(data, svgId, func){
 				func(d);
 	        }); 
 	        
-	    var enterA = enterG.append("g")
-	    					.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
-        enterA.append("path")
-	        .attr("fill",function(d,i){  
-		            return compute(linear(d.value));
-		        })  
-		        .attr("d",function(d){  
-		            return arc(d);
-		        })
-		        .attr("id", function(d,i){
-		            return d.type;
-		        })
-		        .on("click", function(d, i){
-					func(d);
-		        }); 
-        
-        
-        //添加标签
-        var dataset2 = [];
-        for(var i=0; i<piece; i++){
-            dataset2.push({"value":i, "startAngle":angles[i], "endAngle":angles[i+1], "padAngle":0});
-        }
-        console.log(dataset2);
-        
-        var arc = d3.svg.arc()
-        			.innerRadius(0)
-        			.outerRadius(height/3);
-
+	var enterA = enterG.append("g")
+						.attr("class", "arc")
+	    				.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
+    enterA.append("path")
+	    .attr("fill",function(d,i){  
+		        return d.color;
+		    })  
+		.attr("d",function(d){  
+		    return arc(d);
+		})
+		.attr("id", function(d,i){
+			return d.type;
+		})
+		.on("click", function(d, i){
+			func(d);
+		}); 
+    
+    //标签文字
+    var labels = [];
+    for(var i=0; i<piece; i++){
+    	labels.push(i+1);
+    }
+    console.log(labels);
+    var labeldata = [];
+    labels.forEach(function(d,i){
+    	labeldata.push({"startAngle":angles[i],	"endAngle":angles[i+1], "padAngle":0, "value":d});
+    })
+    console.log(labeldata);
+    
+    var labelArc = d3.svg.arc()
+		    			.innerRadius(0)
+		    			.outerRadius((width/3)*1.05);
+	var l = s.selectAll(".label");
+	var lg = l.data(labeldata)
+				.enter()
+				.append("g")
+				.attr("class", "label")
+				.attr("transform","translate(" + (width/2) +","+ (height/2) +")");
+	lg.append("text")
+		.attr("transform",function(d){  
+            var x=labelArc.centroid(d)[0]*2.5;  
+            var y=labelArc.centroid(d)[1]*2.5+4;  
+            return "translate("+x+","+y+")";  
+        })  
+        .attr("text-anchor","middle") 
+        .attr("fill", d3.rgb(175,0,0))
+        .text(function(d){  
+            return d.value;  
+        }); 
 	
+	var type = "";
+	if(piece==4){
+		type="季度";
+	}
+	else if(piece==12){
+		type="月份";
+	}
+	else if(piece==7){
+		type="星期";
+	}
+	else{
+		type="other";
+	}
+//	console.log(type)
+	s.append("text")
+		.attr("id", "type")
+		.text(type)
+        .attr("transform", "translate("+(padding*2)+","+padding*2+")");;
+
 }
-
-

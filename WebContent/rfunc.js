@@ -38,7 +38,7 @@ function drawPie(data, str, w, h){
     .on("click", function(d){
         
        
-        $.post("/Demo/BackServer",
+        $.post("/Demo/TimeServlet",
      			 {
      			"type":"week",   //星期
      			"starty" :"2006",
@@ -60,7 +60,7 @@ function drawPie(data, str, w, h){
         	        });
         
         	
-            $.post("/Demo/BackServer",
+            $.post("/Demo/TimeServlet",
              	    {
         	  			"type":"year",   //年份
         	  			"starty" :"2006",
@@ -96,7 +96,7 @@ function drawPie(data, str, w, h){
         })
         .on("click", function(d){
            
-            $.post("/Demo/BackServer",
+            $.post("/Demo/TimeServlet",
          			 {
          			"type":"week",   //年份
          			"starty" :"2006",
@@ -118,7 +118,7 @@ function drawPie(data, str, w, h){
          	    });
             
             	
-                $.post("/Demo/BackServer",
+                $.post("/Demo/TimeServlet",
                  	    {
             	  			"type":"year",   //年份
             	  			"starty" :"2006",
@@ -138,9 +138,12 @@ function drawPie(data, str, w, h){
 							drawLineGraph(js, "roadyear");
                	        });
               
-                $.post("/Demo/DataServlet",
+                $.post("/Demo/RoadServlet",
                  	    {
-            	  			"lh" :d.data[0]     //全体
+                			"type":"jdwz",
+                			"starty":"2006",
+                			"endy":"2016",
+            	  			"set" :d.data[0]     //某条路事故发生的绝对位置
               	 	    },
                         function(data,status){
               	 	    	

@@ -1,0 +1,45 @@
+		html{height:100%}
+        body{height:100%;margin:0px;padding:0px}
+        .layui-body{height:100%;}
+		#content1{
+			padding: 15px; display: none; 
+			height:100%;
+		}
+		#content2{
+			padding: 15px; display: none; 
+		}
+		div.PA{
+
+			padding-bottom: 50px;
+		}
+		#PB{
+			position: absolute;
+			left:700px;
+			top: 20px;
+		}
+		div.PC{
+		}
+		div.PD{
+			position: absolute;
+			top: 550px;
+			left: 50px;
+		}
+		div.SA{
+			position: absolute;
+			top: 20px;
+		}
+		div.SB{
+			position: absolute;
+			top: 20px;
+			left: 550px;
+		}
+		div.SC{
+			position: absolute;
+			top: 550px;
+			left:50px;
+		}
+		div.SD{
+			position: absolute;
+			top: 550px;
+			left: 400px;
+		}

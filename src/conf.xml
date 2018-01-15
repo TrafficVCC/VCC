@@ -1,0 +1,40 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	 <settings>  
+  		<!--解决，查询返回结果含null没有对应字段值问题-->  
+  		<setting name="callSettersOnNulls" value="true"/>  
+  	</settings>  
+
+	<!-- mybatis别名定义 -->
+    <typeAliases> 
+        <typeAlias alias="RoadNet" type="hfut.vcc.mapping.RoadNet"/> 
+    </typeAliases> 
+	
+   <environments default = "development">
+      <environment id = "development">
+         <transactionManager type = "JDBC"/> 
+		 <!-- 配置数据库连接信息 -->
+         <dataSource type = "POOLED">
+            <property name = "driver" value = "com.mysql.jdbc.Driver"/>
+            <property name = "url" value = "jdbc:mysql://localhost:3306/vcc?allowMultiQueries=true"/>
+            <property name = "username" value = "root"/>
+            <property name = "password" value = "654111"/>
+         </dataSource>   
+         
+      </environment>
+   </environments>
+	
+   <mappers>
+   	  <mapper class = "hfut.vcc.mapping.TimeMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.RoadMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.RoadNetMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.OtherMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.CoordinateMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.TestMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.RoadFittingMapper"/>
+   	  <mapper class = "hfut.vcc.mapping.DfldMapper"/>
+   </mappers>
+   
+</configuration>

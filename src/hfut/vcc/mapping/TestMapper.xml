@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.TestMapper">
+
+	<select id="monthQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap">
+     	select YEAR(sgfssj) as year , MONTH(sgfssj) as month, count(*) as count
+		from jysg 
+		where sgfssj is not null
+		<if test='set!="0"'>
+			and lh = #{set}
+		</if>
+		group by year,month
+		<if test='yearArray != null and yearArray[0] != "0"'>
+			having year in
+			<foreach collection="yearArray" item="item" open="(" close=")" separator=",">
+           		#{item}
+        	</foreach>
+        </if>
+	    order by year
+     </select>
+     
+</mapper>

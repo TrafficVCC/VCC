@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.RoadMapper">
+	
+	 <select id = "selectRoad" parameterType="hashmap" resultType="hashmap">
+     	select lm as name, count(*) as value 
+     	from jysg
+     	where lm in
+     	<foreach collection="lm" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item3" open="(" close=")" separator=",">
+               	#{item3}
+            </foreach>
+		</if>
+     	group by name
+     	order by value
+     </select>
+
+</mapper>

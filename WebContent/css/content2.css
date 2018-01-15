@@ -1,0 +1,31 @@
+#display{
+	height: 90%;
+	width: 20%; 
+	float: left;
+	overflow: auto;
+}
+#map{
+	height: 100%; 
+	width: 80%; 
+	float: left;
+}
+
+div#searchRoad{
+	margin: 10px 10px 10px 10px;
+}
+div#btn{
+	margin: 20px 20px 20px 20px;
+}
+
+ol#list{
+	padding-left: 20px;
+}
+
+
+
+
+
+
+/*去除地图左下方baidu logo*/
+.BMap_cpyCtrl {display: none;}
+.anchorBL {display: none;}

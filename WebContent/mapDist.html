@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>测距</title>
+		<!--加载百度地图API库-->
+    	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	
+    	<script type="text/javascript" src="js/jquery-3.2.1.js"></script>
+    	
+    	<style type="text/css">
+    		html{height: 100%;}
+    		body{height: 100%; margin: 0px; padding: 0px;}
+    		#display{height: 90%; width: 20%; float: left;}
+    		#map{height: 100%; width: 80%; float: left;}
+    		#btn {display:block;bottom:0px;right:1px;right:18px;width:200px;line-height:30px;position:fixed;border:1px solid #fff;text-align:center;color:#fff;}
+    		/*去除地图左下方baidu logo*/
+    		.BMap_cpyCtrl {display: none;}
+        	.anchorBL {display: none;}
+    	</style>
+	</head>
+	
+	<body>
+		<div id="map"></div>
+		
+		<div id="display" style="overflow: auto;">
+			<!-- padding-left设置p元素左内边距，相当于将里面的元素向右移动 -->
+			<p style="padding-left: 20px;">
+				路名：<input type="text" name="road" />
+			</p>
+			<p style="padding-left: 10px;">
+				<ol id="list"></ol>
+			</p>
+		</div>
+		
+		<div id="btn">
+			<button type="button" onClick="onOpen()">开启拾取</button>
+			<button type="button" onClick="onSubmit()">提交</button>
+		</div>
+	</body>
+	
+	<script type="text/javascript">
+		//定义json数组存储道路数据
+		var data = {"way":"", "points":[]};
+		var id = 0;
+
+		//创建地图
+		var map = new BMap.Map("map", {enableMapClick:false});
+		map.centerAndZoom("合肥",15);
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		//添加百度地图测距功能
+		var opts = {lineColor:"blue",lineStroke :5, opacity:0.8};
+		var myDis = new BMapLib.DistanceTool(map,opts);
+		
+		//测距过程中，每次点击底图添加节点时，派发事件的接口
+		myDis.addEventListener("addpoint",function(e){
+			console.log(e.point.lng + "," + e.point.lat);
+			var li = "<li>("+e.point.lng+" , "+e.point.lat+")</li>";
+			$("#list").append(li);
+			//将坐标点存入data
+			id = id + 1;
+			var obj = {"id":id, "lng":e.point.lng, "lat":e.point.lat};
+			data.points.push(obj);
+		});
+		
+		//测距时，每次双击底图结束当前测距折线时，派发事件的接口
+		myDis.addEventListener("drawend", function(e) {  
+				console.log(e.overlays[0].getPath());
+		});
+		
+		function onOpen () {
+			myDis.open();
+		}
+		
+		function onSubmit () {
+			var name = $("input:text").val();
+			if(name=="") {
+				alert("请输入路名");
+				return;
+			}
+			data.way = name;
+			alert(data.way);
+			console.log(data);
+			for(var i=0; i<data.points.length; i++) {
+				console.log(data.points[i]);
+			}
+			$.post("/Demo/RoadServlet",
+				{
+					"data": JSON.stringify(data)
+				},
+				function(data, status) {
+					alert(status);
+				}
+			);
+		}
+	</script>
+</html>

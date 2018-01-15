@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.OtherMapper">
+
+	<select id="clisgQuery" resultType="hashmap">
+		select * from cljsg
+	</select> 
+	
+	<select id="dcsgQuery" resultType="hashmap">
+		select * from dcsg
+	</select> 
+	
+	<select id="rdyyflQuery" resultType="hashmap">
+		select * from rdyyfl
+	</select> 
+	
+	<select id="sgxtQuery" resultType="hashmap">
+		select * from sgxt
+	</select> 
+	
+	<select id="tqQuery" resultType="hashmap">
+		select * from tq
+	</select> 
+	
+	<select id="xzqhQuery" resultType="hashmap">
+		select * from xzqh;
+	</select> 
+	
+	<!-- 属性查询,动态传入字段名,必须设置为STATEMENT(非预编译) -->
+	<select id="factorQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
+     	select ${attr1}, ${attr2}, count(*) as count
+		from jysg 
+		<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>  
+		<if test='set!="0"'>
+			and lh = ${set}
+		</if>
+		
+		<if test='content1 == "null"'>
+			and ${attr1} is null
+		</if>
+		<if test='content1 != "0" and content1 != "null"'>
+			and ${attr1} = ${content1}
+		</if>	
+		<if test='content2 == "null"'>
+			and ${attr2} is null
+		</if>
+		<if test='content2 != "0" and content2 != "null"'>
+			and ${attr2} = ${content2}
+		</if>
+		group by ${attr1}, ${attr2}
+     </select>
+     
+  	<!-- 支持多选,一个属性同时多个值 --> <!-- ifnull判断某个字段是否为null,是就用"null"代替 -->
+     <select id="factorQuery2" parameterType="hashmap" resultType="java.util.LinkedHashMap" >
+     	select ifnull(${attr1},"null") as ${attr1}, ifnull(${attr2},"null") as ${attr2}, count(*) as count
+     	from jysg
+     	where sgfssj is not null
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	${item}
+            </foreach>
+		</if> 
+     	
+     	<if test='set != null and set[0] != "0"'>
+			and lm in
+			<foreach collection="set" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>       
+		
+		<foreach collection="allAttr" item="item">
+        	<if test='item.content != null and item.content[0] != "0"'>
+				and ${item.attr} in
+				<foreach collection="item.content" item="item2" open="(" close=")" separator=",">
+               		${item2}
+            	</foreach>
+			</if>
+        </foreach>
+		
+		group by ${attr1}, ${attr2}
+		order by ${attr1}, ${attr2}
+     </select>
+   
+     
+     <!--  查询各属性对应内容的数量 -->
+     <select id="factorCountQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
+     	select ${attr}, count(*) as count
+     	from jysg
+     	<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>  
+     	<if test='set!="0"'>
+			and lh = ${set}
+		</if>
+		group by ${attr}
+     </select>
+     
+</mapper>

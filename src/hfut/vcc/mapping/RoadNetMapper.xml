@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.RoadNetMapper">
+
+	<!--执行增加操作的SQL语句。id和parameterType分别与IUserOperation接口中的addUser方法的名字和参数类型一致。
+    useGeneratedKeys设置为"true"表明要MyBatis获取由数据库自动生成的主键；keyProperty="id"指定把获取到的主键值注入到User的id属性--> 
+    <insert id="addPoint" parameterType="RoadNet"
+        useGeneratedKeys="true" keyProperty="id"> 
+        insert into roadnet(lng,lat,distance,way,ld)  
+        values(#{lng},#{lat},#{distance},#{way},#{ld})  
+    </insert>
+    
+    <delete id="deletePoint" parameterType="int">
+        delete from roadnet where id=#{id}
+    </delete>
+    
+    <select id="selectRoad" parameterType="String" resultType="hashmap">
+    	select id, ld, lng, lat, distance
+    	from roadnet
+    	where way = #{way}
+    	order by distance
+    </select>
+	
+	<select id = "selectjdwz" parameterType="hashmap" resultType="hashmap">
+     	select lm, jdwz, count(*) as count from jysg
+     	where lm = #{lm} 
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+     	group by jdwz
+     	order by jdwz
+     </select>
+     
+     <select id = "selectxzqh" parameterType="hashmap" resultType="hashmap">
+     	select xzqh, xzqhms, count(*) as count
+     	from jysg
+     	where YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     	group by xzqh, xzqhms
+		ORDER BY count
+     </select>
+     
+     <select id="selectsgdd" parameterType="hashmap" resultType="hashmap">
+     	select sgdd, jdwz, count(*) as count
+     	from jysg
+     	where lm = #{lm} and YEAR(sgfssj) = #{year} and MONTH(sgfssj) = #{month}
+     	group by sgdd,jdwz
+     	order by count
+     </select>
+     
+     <!-- 查询jdwz的经纬度坐标-->
+     <select id = "selectCoor" parameterType="hashmap" resultType="hashmap">
+     	select jdwz, lng_jdwz, lat_jdwz, count(*) as count 
+     	from jysg
+     	where lm = #{lm} 
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+     	group by jdwz, lng_jdwz, lat_jdwz
+     	order by jdwz
+     </select>
+	
+</mapper>

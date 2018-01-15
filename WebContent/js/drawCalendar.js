@@ -1,11 +1,13 @@
 //syear.选择的年份。
 //smonth.选择的月份。
-//data.选定某年某月的事故数量数据.结构：[{"day":XX, "xq":X, "count":XXX}, {…,…,…},……]
+//data.选定某年某月的事故数量数据.
+//结构：[{"day":XX,"count":XXX},……]
 //svgId.画布Id
 //func.点击矩形触发的函数。
+//func(d).d[0]:(该块为)几号, d[1]:第几周, d[2]:周几, d[3]:事故数量.
 
 //画日历图
-function drawCal(syear, smonth, data, svgId, func){
+function drawCalendar(syear, smonth, data, svgId, func){
 	var stime = [[syear,smonth]];
 	var xqTitle = ["日","一","二","三","四","五","六"];
 	var dataset = [];
@@ -14,49 +16,47 @@ function drawCal(syear, smonth, data, svgId, func){
 	var days = d3.time.days(new Date(syear, smonth-1, 1), new Date(syear, smonth, 1));
 	var weekBase = d3.time.weekOfYear(new Date(syear, smonth-1, 1));
 	
+	var mc = [];
+	data.forEach(function(d){
+		mc[d.day] = d.count;
+	});
+	
 	days.forEach(function(d,i){
 		a = i+1;
 		b = d3.time.weekOfYear(d)-weekBase+1;
 		c = d.getDay();
-		dataset.push([a,b,c]);
-//		dataset.push([a,b,c,data[i].count]);
-//		dataset2.push(data[i].count);
+		e = 0;
+		if(mc[a]){
+			e = mc[a];
+		}
+		dataset.push([a,b,c,e]);
+		dataset2.push(e);
 	});
 	console.log(dataset);
 	//dataset:[日期，第几周，周几，数量]
 	
-	//求最大最小值
-	var getmax = function(a){
-		var max=a[0];
-	    for(var i=1; i<a.length; i++){
-	        max = Math.max(max, a[i]);
-	    }
-	    return max;
-	}
-	var getmin = function(a){
-		var min = a[0];
-	    for(var i=1; i<a.length; i++){
-	        min = Math.min(min, a[i]);
-	    }
-	    return min;
-	}
-	var max = getmax(dataset2);
-	var min = getmin(dataset2);
-	
-	//颜色
-	var color1 = d3.rgb(255,250,250);
-    var color2 = d3.rgb(175,0,0);
-	var linear = d3.scale.linear()  
-        .domain([min,max])  
-        .range([0,1]);
-    var compute = d3.interpolate(color1,color2);  
-	
 	//提取svg的宽度长度
 	var width = d3.select("#"+svgId).attr("width");
 	var height = d3.select("#"+svgId).attr("height");
-	//	alert(width, height);
 	//边缘
 	var padding = height/20;
+	
+	//求最大最小值
+	var min = dataset2[0];
+	var max = 0;
+	dataset2.forEach(function(d,i){
+		min = Math.min(min, d);
+		max = Math.max(max, d);
+	});
+	
+	//颜色
+	var color1 = d3.rgb(255,255,255);
+    var color2 = d3.rgb(175,0,0);
+	var linear = d3.scale.linear()  
+        .domain([0,max])
+        .range([0,1]);
+    var compute = d3.interpolate(color1,color2);  
+	
 	//判断
 	var row = function(d){
 		var week1 = d3.time.weekOfYear(d[0]);
@@ -84,8 +84,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.text(function(d){
 			return d[0].toString()+"年"+d[1].toString()+"月";
 		})
-		.attr("fill","black")
-		.attr("font-size",width/20);
+		.attr("fill","black");
 		
 	enterT.append("text")
 		.attr("class", "time")
@@ -97,8 +96,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.text(function(d){
 			return d[0].toString()+"年"+d[1].toString()+"月";
 		})
-		.attr("fill","black")
-		.attr("font-size",width/20);
+		.attr("fill","black");
 	
 	//画标题
 	var title = s.selectAll(".title");
@@ -113,7 +111,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.attr("y", padding+recth)
 		.attr("width", rectw)
 		.attr("height", recth)
-		.attr("fill",d3.rgb(255,255,200))
+		.attr("fill","#E5E5E5")
 		.attr("stroke", "#ccc");
 
 	enterTitle.append("rect")
@@ -124,7 +122,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.attr("y", padding+recth)
 		.attr("width", rectw)
 		.attr("height", recth)
-		.attr("fill",d3.rgb(255,255,200))
+		.attr("fill","#E5E5E5")
 		.attr("stroke", "#ccc");
 	
 	var w = s.selectAll(".xq")
@@ -141,8 +139,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.text(function(d){
 			return d;
 		})
-		.attr("fill", "black")
-		.attr("font-size",width/20);
+		.attr("fill", "black");
 	
 	enterW.append("text")
 		.attr("class","xq")
@@ -154,8 +151,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.text(function(d){
 			return d;
 		})
-		.attr("fill", "black")
-		.attr("font-size",width/20);
+		.attr("fill", "black");
 		
 	//画日历
 	//矩形
@@ -174,8 +170,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.attr("width", rectw)
 		.attr("height", recth)
 		.attr("fill",function(d){
-			return "none";
-//			return compute(d[3]);
+			return compute(linear(d[3]));
 		})
 		.attr("stroke", "#ccc")
 		.on("click", function(d){
@@ -193,8 +188,7 @@ function drawCal(syear, smonth, data, svgId, func){
 		.attr("width", rectw)
 		.attr("height", recth)
 		.attr("fill",function(d){
-			return "none";
-			return compute(d[3]);
+			return compute(linear(d[3]));
 		})
 		.attr("stroke", "#ccc")
 		.on("click", function(d){
@@ -215,7 +209,6 @@ function drawCal(syear, smonth, data, svgId, func){
 			return padding+(d[1]+1)*recth+(recth)/1.5
 		})
 		.attr("text-anchor", "middle")
-		.attr("font-size",width/20)
 		.text(function(d){
 			return d[0];
 		});
@@ -229,7 +222,6 @@ function drawCal(syear, smonth, data, svgId, func){
 			return padding+(d[1]+1)*recth+(recth)/1.5
 		})
 		.attr("text-anchor", "middle")
-		.attr("font-size",width/20)
 		.text(function(d){
 			return d[0];
 		});

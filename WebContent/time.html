@@ -1,41 +1,29 @@
-<html>   
-    <head>
-        <meta charset="utf-8">
-        <title>Counted By Time</title>
-        <script src="js/d3.v3.min.js" charset="utf-8"></script>
-        <script src="js/jquery-3.2.1.js" charset="uft-8"></script>
-       
-        <script type="text/javascript" src="js/drawLineByYear.js"></script>
-          <script type="text/javascript" src="tfunc2.js" ></script>
-              <script type="text/javascript" src="rosefunc.js" ></script>
-        	
-        <style type="text/css"></style>
-    </head>   
-    <body>
-        
-        <div>
-		     <div> 
-		     	<button onclick= "drawLineGraphByYear();">年代折线图</button>
-		     	<button onclick= "drawRoseGraphByYear();">季度玫瑰图</button>
-		     	<button onclick= "drawRoseGraphByMonth();">月份玫瑰图</button>
-		     	<button onclick= "drawRoseGraphByWeek();">星期玫瑰图</button>
-		     </div>  
-	        <div>
-		        <svg id="cyear"  height="210" width="1000" ></svg>
-	        </div>
-	        <div id = "Hello"></div>
-	        <div>
-		        <svg id="rose1" width="400" height="400" ></svg>
-		        <svg id="rose2" width="400" height="400"></svg>
-		        <svg id="rose3" width="400" height="400"></svg>
-		        
-	        </div>
-	         <div id = "Hello">
-		   
-	        </div>
-	        
-        </div>
-    </body>
-    
-    
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>时间</title>
+<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+</head>
+<body>
+
+</body>
+
+<script>
+	
+	//contentA
+	var year = ["2014","2015","2016"];
+	var roadList = ["徽州大道","马鞍山路","芜湖路","黄山路","怀宁路","休宁路","金寨路","九华山路"];
+	$.post("/Demo/TimeServlet",
+	{
+		"type":"month",   //月份
+		"year[]": year,
+		"set" : roadList   //全体
+	},
+	function(data,status){
+	    js = eval('(' + data + ')');
+	    alert(status);
+	});
+
+</script>
 </html>

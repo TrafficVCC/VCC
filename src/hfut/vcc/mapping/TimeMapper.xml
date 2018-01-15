@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.TimeMapper">
+
+    <select id="yearQuery" parameterType="hashmap" resultType="hashmap">
+        select YEAR(sgfssj) as year , count(*) as count
+		from jysg 
+		where sgfssj is not null
+		<if test='set != "0"'>
+			and lh = #{set}
+		</if>
+		group by year 
+       <if test='year != null and year[0] != "0"'>
+			having year in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if> 
+        order by year
+    </select>	
+    
+     <select id="monthQuery" parameterType="hashmap" resultType="hashmap">
+     	select YEAR(sgfssj) as year , MONTH(sgfssj) as month, count(*) as count
+		from jysg 
+		where sgfssj is not null
+		<if test='set != null and set[0] != "0"'>
+			and lm in
+			<foreach collection="set" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>       
+		group by year,month
+        <if test='year != null and year[0] != "0"'>
+			having year in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if> 
+        order by year
+     </select>
+    
+</mapper>

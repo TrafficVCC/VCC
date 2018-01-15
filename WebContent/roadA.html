@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- 引入 echarts.js -->
+    <script type="text/javascript" src="js/echarts.js" ></script>
+    <script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+    <script type="text/javascript" src="js/Road_analyzer.js" ></script>
+    <script type="text/javascript" src="js/commonfunc.js" ></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width: 1000px;height:400px;"></div>
+    <script>
+
+	var myChart = echarts.init(document.getElementById('main'));
+	var year = ["2014","2015","2016"];
+	var lm = "休宁路";
+	var month = ["0"];
+	$.post("/Demo/RoadFittingServlet",
+		{
+			"type":"road_fitting",  
+			"year[]": year,		//最好一定加上[]
+			"month[]": month,
+			"lm": lm
+	    },
+        function(data1,status){
+    	js = eval('(' + data1 + ')');
+    	data=[];
+    	 for (var i = 1; i < js.length; i++) {  
+    	    data.push(js[i]);
+    	    date.push(i);
+    	}
+    	 
+    	 option.series[0].data=data;
+    	 option.xAxis.data = date;
+    	 myChart.setOption(option);
+    	 
+    	 alert(findhot(data,500)[0]);
+
+    });
+	
+	
+	
+	
+
+</script>	
+</body>
+</html>

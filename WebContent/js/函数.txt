@@ -1,0 +1,32 @@
+年代堆积图--drawStackedLine
+
+
+每个月份的数据折线图--drawMonthLine
+
+玫瑰图--drawRoseGraph
+
+道路列表--writeRoadList
+
+年历图--drawYearCal
+
+模拟事故在道路发生分布的直方图--drawCountOnRoad
+
+属性图--drawAG
+
+道路饼图--drawRoadPie
+
+散点图--drawPoints
+
+
+
+需要全局变量
+window.years = ["2014","2015","2016"];
+window.months = "0";
+window.originYears = ["2014","2015","2016"];
+window.originRoads = "0";
+window.yflags = [0,0,0];
+window.roads = "0";
+window.tempRoad = "0";
+window.lockedFlag = 0;
+window.attrs = ["tq", "cljsg", "dcsg","sgxt"];
+window.attrFlag = ["0","0","0"];

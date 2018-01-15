@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.RoadFittingMapper">
+
+	 <!--  查询各属性对应内容的数量 -->
+     <select id="roadfittingQuery" parameterType="hashmap" resultType="java.util.LinkedHashMap">
+     	select jdwz, count(*) as count
+     	from jysg
+     	where lm = #{lm} 
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	#{item}
+            </foreach>
+		</if>
+     	<if test='month != null and month[0] != "0"'>
+			and MONTH(sgfssj) in
+			<foreach collection="month" item="item2" open="(" close=")" separator=",">
+               	#{item2}
+            </foreach>
+		</if>
+		group by jdwz
+		order by jdwz
+     </select>
+	
+</mapper>

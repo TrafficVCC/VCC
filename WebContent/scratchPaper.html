@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Scratch Paper</title>
+		<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+		<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+		<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
+		<script type="text/javascript" src="js/drawLineByYear.js" ></script>
+		<script type="text/javascript" src="js/drawYearCal.js" ></script>
+		<script type="text/javascript" src="js/drawScatters.js" ></script>
+		<script type="text/javascript" src="js/drawStackedLine.js" ></script>
+		<script type="text/javascript" src="js/drawParallelAxis.js" ></script>
+		<script type="text/javascript" src="js/drawMonthLine.js" ></script>
+		<script type="text/javascript" src="js/writeRoadList.js" ></script>
+
+	</head>
+	<style type="text/css">
+
+		div#graph{
+				width: 1000px;
+				height: 500px;
+				/*position: absolute;
+				left: 0px;
+				top: 0px;*/
+				/*background-color: #40AFFE;*/
+				border:1px solid #2E2D3C;
+				overflow-y:auto;
+		}
+	</style>
+	<style>
+	svg {
+	  font: 10px sans-serif;
+	}
+	
+	.background path {
+	  fill: none;
+	  stroke: #ddd;
+	  shape-rendering: crispEdges;
+	}
+	
+	.foreground path {
+	  fill: none;
+	  stroke: steelblue;
+	}
+	
+	.brush .extent {
+	  fill-opacity: .3;
+	  stroke: #fff;
+	  shape-rendering: crispEdges;
+	}
+	
+	.axis line,
+	.axis path {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+	
+	.axis text {
+	  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+	  cursor: move;
+	}
+	
+	</style>
+	<body>
+		<div>
+			<div id="graph">
+			<svg id="graph1" width="1000" height="1000" style="display: block;" ></svg>
+			</div>
+			<svg id="graph2" width="650" height="250"></svg>
+		</div>
+		<script>
+			$.post("/Demo/OtherServlet",
+			{
+				"type": "factor",
+				"starty" :"2014",
+				"endy" : "2016",
+				"set" : "30022"     //全体
+			},
+			function(data,status){
+			    js = eval('(' + data + ')');
+			  	console.log("数据：" + js + "\n状态：" + status);
+			  	alert("00");
+			    drawParallelAxis(js,"graph1",show);
+			});
+
+
+			
+			function show(){};
+
+		</script>
+	</body>
+</html>

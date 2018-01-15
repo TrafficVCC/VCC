@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>calendar</title>
+<style type="text/css"></style>
+<link rel="stylesheet" type="text/css" href="css/t.css">
+<script src="js/d3.v3.min.js" charset="utf-8"></script>
+<script src="js/jquery-3.2.1.js" charset="uft-8"></script>
+<script src="js/drawScatters.js" charset="uft-8"></script>
+</head>
+
+<body>
+ <div>
+	<svg id="interval"  height="210" width="1000" ></svg>
+</div>
+
+<script type="text/javascript">
+
+	$.post("/Demo/RoadServlet",
+ 	    {
+  			"type": "interval",
+  			"set": "00002"
+	 	},
+        function(data,status){
+	 	    
+	 	    js = eval('(' + data + ')');
+	 	    alert(js);
+            for(var i=0; i<js.length; i++) {
+            	console.log(js[i]);
+            }
+            graph = "interval";
+            drawScatters(js, graph, function (d){
+            	alert(1);
+            });
+	     });
+             
+</script>
+</body>
+</html>
