@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>道路拟合</title>
+<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+</head>
+<body>
+	
+</body>
+
+<script>
+	var year = ["2014","2015","2016"];
+	var lm = "休宁路";
+	var month = ["0"];
+	$.post("/Demo/RoadFittingServlet",
+		{
+ 			"type":"road_fitting",  
+			"year[]": year,		//最好一定加上[]
+			"month[]": month,
+			"lm": lm
+	    },
+            function(data,status){
+	    	js = eval('(' + data + ')');
+	    	console.log(js);
+   	    });
+</script>	
+
+</html>

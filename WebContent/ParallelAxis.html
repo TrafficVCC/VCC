@@ -3,43 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-
+<script type="text/javascript" src="js/d3.v3.min.js" ></script>
 <script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+<script type="text/javascript" src="js/drawAG.js" ></script>
 
 </head>
 <body>
-
+<div>
+<svg id = "graph1" width =600 height = 500></svg>
+</div>
 </body>
 
 <script>
-	var attr = ["tq","cljsg","dcsg"];
-	var content = ["1/2/3","2/3","0"];
+
+	window.attrs = ["tq","sgxt","dcsg"];
+	window.attrFlag = ["0","0","0"];
 	$.post("/Demo/OtherServlet",
 		{
  			"type":"factor",  
 			"starty" : "2014",
 			"endy" : "2014",
-			"set" : "30022",   
-			"attr[]": attr,		//js会将attr转换成attr[],所以最好直接写成attr[]
-			"content[]": content	
+			"set" : "0",   
+			"attr[]": window.attrs,		//js会将attr转换成attr[],所以最好直接写成attr[]
+			"content[]": window.attrFlag	
 	    },
             function(data,status){
 	    	js = eval('(' + data + ')');
 	    	console.log(js);
+	    	drawAG(js, "graph1", func);
    	    });
-	
-	$.post("/Demo/OtherServlet",
-			{
-	 			"type":"factorCount",   
-				"starty" : "2014",
-				"endy" : "2014",
-				"set" : "30022",    //全体
-				"attr[]": attr,	
-				"content[]": ""
-		    },
-	            function(data,status){
-		    	js = eval('(' + data + ')');
-		    	console.log(js);
-	   	    });
+		function func()
+		{
+			$.post("/Demo/OtherServlet",
+					{
+			 			"type":"factor",  
+						"starty" : "2014",
+						"endy" : "2014",
+						"set" : "0",   
+						"attr[]": window.attrs,		//js会将attr转换成attr[],所以最好直接写成attr[]
+						"content[]": window.attrFlag	
+				    },
+			            function(data,status){
+				    	js = eval('(' + data + ')');
+				    	console.log(js);
+				    	drawAG(js, "graph1", func);
+			   	    });
+			
+		}
+
 </script>
 </html>

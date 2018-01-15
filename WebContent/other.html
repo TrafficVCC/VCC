@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>平行坐标图</title>
+<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+</head>
+<body>
+
+</body>
+
+<script>
+
+var attr = ["tq", "cljsg", "sgxt"];
+var content = ["0","0","0"];
+var roadList = ["徽州大道","马鞍山路","芜湖路","黄山路","怀宁路","休宁路","金寨路","九华山路"];
+var year = ["2014"];
+$.post("/Demo/OtherServlet",
+		{
+			"type":"factor",   //属性
+		    "year[]": year,
+			"set[]" : roadList,    //全体
+			"attr[]": attr,		//js会将attr转换成attr[],所以最好直接写成attr[]
+			"content[]": content
+		},
+		    function(data,status){
+			js = eval('(' + data + ')');
+			alert(status);	
+		});
+
+</script>
+</html>

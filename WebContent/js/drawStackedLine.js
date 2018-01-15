@@ -3,11 +3,14 @@
 //data 结构为[{"year":d, "count":[d]}, …… ].
 //func1 点击堆积图会调用的函数，func1(d):d是syear 选择年份。
 //func2 点击折线图
-//全局变量，yflags
+//涉及全局变量，window.yflags, window.years
 
-function drawStackedLine(data, svgId, func, yFlags){
+function drawStackedLine(data, svgId, func){
 //	$("svg#"+svgId).empty();
-	
+	var yFlags =[];
+	yFlags = window.yflags;
+	var arrayYear =[];
+	arrayYear = window.years;
 	var syear = [];
 	var soneyear = [];
 	//数据转换
@@ -24,7 +27,7 @@ function drawStackedLine(data, svgId, func, yFlags){
 		
 	});
 //	console.log(dataset1);
-//	console.log(yFlags);
+	console.log(yFlags);
 	var stack = d3.layout.stack()
 					.values(function(d){ return d; })  
                     .x(function(d){ return d.month; })  
@@ -36,7 +39,7 @@ function drawStackedLine(data, svgId, func, yFlags){
 	var width = d3.select("#"+svgId).attr("width");
 	var height = d3.select("#"+svgId).attr("height");
 	//边缘
-	var padding = {top:(50), right:(100), bottom:(50), left:(50) };
+	var padding = {top:(50), right:(50), bottom:(50), left:(50) };
 	
 	var lineWidth = height/100;
 
@@ -55,6 +58,14 @@ function drawStackedLine(data, svgId, func, yFlags){
     var color = d3.scale.category10();
     
     var s = d3.select("#"+svgId);
+    
+    s.append("text")
+    	.attr("id", "title")
+    	.text("事故发生数量统计图")
+		.style("text-anchor", "middle")
+		.style("font-size","18px")
+	    .attr("x", width/2)
+	    .attr("y", padding.top/2);
     
     //坐标轴，网格
     s.selectAll("g.axis")
@@ -149,29 +160,41 @@ function drawStackedLine(data, svgId, func, yFlags){
         		return 0.5;
         })
         .on("click", function(d,i){
-        	soneyear = data[i].year;
-			yFlags[i] = (yFlags[i]+1)%2;
-//      	console.log(yFlags);
-        	
+        	soneyear = data[i].year.toString();
         	syear = [];
-        	yFlags.forEach(function(d,i){
-        		if(d){
-        			syear.push(data[i].year.toString());
-        		}
-        	});
-//      	console.log(syear);
-        	window.years = syear;
         	
-        	if(yFlags[i]){
+        		s.selectAll("path.area")
+        			.attr("opacity", 0.5);
         		d3.select(this)
         			.attr("opacity", 1.0);
-        	}
-        	else{
-        		d3.select(this)
-        			.attr("opacity", 0.5);
-        	}
+        		syear.push(soneyear);
         	
-        	func(syear);
+        	
+        	window.years = syear;
+        	alert("选择"+syear);
+        	func();
+        	
+//			yFlags[i] = (yFlags[i]+1)%2;
+//      	console.log(yFlags);
+
+//        	syear = [];
+//        	yFlags.forEach(function(d,i){
+//        		if(d){
+//        			syear.push(data[i].year.toString());
+//        		}
+//        	});
+////      	console.log(syear);
+//        	window.years = syear;
+//        	
+//        	if(yFlags[i]){
+//        		d3.select(this)
+//        			.attr("opacity", 1.0);
+//        	}
+//        	else{
+//        		d3.select(this)
+//        			.attr("opacity", 0.5);
+//        	}
+        	
         	
         	
 
@@ -194,27 +217,16 @@ function drawStackedLine(data, svgId, func, yFlags){
         		return 0.5;
         })
         .on("click", function(d,i){
-        	soneyear = data[i].year;
-			yFlags[i] = (yFlags[i]+1)%2;
-//      	console.log(yFlags);
-        	
+        	soneyear = data[i].year.toString();
         	syear = [];
-        	yFlags.forEach(function(d,i){
-        		if(d){
-        			syear.push(data[i].year.toString());
-        		}
-        	});
-//      	console.log(syear);
-        	window.years = syear;
         	
-        	if(yFlags[i]){
-        		d3.select(this)
-        			.attr("opacity", 1.0);
-        	}
-        	else{
-        		d3.select(this)
-        			.attr("opacity", 0.5);
-        	}
+        	
+        	s.selectAll("path.area")
+        		.attr("opacity", 0.5);
+        	d3.select(this)
+        		.attr("opacity", 1.0);
+        	syear.push(soneyear);
+       
         	
         	func(syear);
         	

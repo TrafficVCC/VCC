@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="js/writeRoadList.js" ></script>
 		<script type="text/javascript" src="js/jysg_start.js" ></script>
 		<script type="text/javascript" src="js/drawCountOnRoad.js" ></script>
+		<script type="text/javascript" src="js/drawAG.js" ></script>
 		
 		<!--加载百度地图API库-->
     	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
@@ -21,15 +22,14 @@
     	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
     	<script src="http://mapv.baidu.com/build/mapv.min.js"></script>	
     	<script src="js/drawMap.js"></script>
+    	<script src="js/drawDfld.js"></script>
+    	
     	<!--加载鼠标绘制工具-->
     	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
     	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
 		
 		<link rel="stylesheet" href="css/content_jysg.css" />
 		<style type="text/css">
-        /*去除地图左下方baidu logo*/
-        .BMap_cpyCtrl {display: none;}
-        .anchorBL {display: none;}
     	</style>
     	
 	</head>
@@ -75,12 +75,13 @@
 	<script src="js/jysgAnalyze.js" ></script>
 	
 	<script>
-		 var year = "2016";
-		 var month = "12";
+		/*
+		 var year = ["2016"];
+		 var month = ["0"];
 		 var lm = "徽州大道";
 		 $.post("/Demo/RoadNetServlet",
         		{
-			 		"type": "road",
+			 		"type": "coor",
         			"year": year,
         			"month": month,
         			"lm": lm
@@ -92,49 +93,32 @@
                    // console.log("数据：" + data + "\n状态：" + status);
                     displayRoad(js_road);
                     displayIntensityJdwz(js_point);
-                    sgddGeocoder(js_point);
-                    //必须等地址解析完才能调用画图函数    
-                    window.setTimeout(displayIntensitySgdd,3000,js_point);
-                    window.setTimeout(compare,4000,js_point);
-                    window.setTimeout(function(){
-                    	/*
-                    	$.post("/Demo/CoordinateServlet",
-            					{
-            						"data": JSON.stringify(js_point)	//将坐标数据存储到数据库中
-            					},
-            					function(data, status) {
-            						alert(status);
-            					}
-            				);
-                    	*/
-                    	for(var i=0; i<js_point.length; i++) {
-                    		console.log(js_point[i]);
-                    	}
-                    }, 5000);
            	    });
-		
-		
-		 /*
-		 $.post("/Demo/RoadNetServlet",
-	        		{
-				 		"type": "xzqh",
-	        			"year": "2016",
-	        			"month": "12",
-	        	    },
-	                    function(data,status){
-	        	    	js = eval('(' + data + ')');
-	                    //console.log(data);
-	                   // displayXzqh(js);
-	           	    });
 		 */
+		 
+		 var lm = "金寨路";
+		 var data = ["200-500","30-80"];
+		 $.post("/Demo/DfldServlet",
+			{
+				"lm": lm,
+				"data[]": data
+			},
+		   		function(data,status){
+			    	js = eval('(' + data + ')');
+			    	var js_road = js[0].road;
+			    	displayRoad(js_road);
+			    	
+			    	var js_dfld = js[0].dfld;
+			    	displayDfld(js_dfld);
+			   	 	console.log(js);
+		   		});
 	
 	</script>
-	
+
 	<script>
 		//创建地图
 	    var map = new BMap.Map("contentD", {enableMapClick:false});
 	    map.centerAndZoom("合肥",15);
 	    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
-	
 	</script>
 </html>

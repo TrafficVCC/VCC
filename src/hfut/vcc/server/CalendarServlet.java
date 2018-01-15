@@ -80,12 +80,12 @@ public class CalendarServlet extends HttpServlet {
 		TimeMapper time = session.getMapper(TimeMapper.class);
 		
 		List<Map<String,Object>> li = new ArrayList<Map<String,Object>>();
-		if(params.get("month").equals("0")) {
-			li = time.dayQueryByYear(params);
-		}
-		else {
-			li = time.dayQuery(params);
-		}
+//		if(params.get("month").equals("0")) {
+//			li = time.dayQueryByYear(params);
+//		}
+//		else {
+//			li = time.dayQuery(params);
+//		}
 		
 		JSONArray js = MySqlUtil.listToJSON(li);
 		session.close();

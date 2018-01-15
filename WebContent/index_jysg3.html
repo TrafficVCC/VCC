@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>简易事故分析</title>
+		<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
+		<script type="text/javascript" src="js/d3.v3.min.js" ></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
+    	<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    	<script src="http://mapv.baidu.com/build/mapv.min.js"></script>	
+    	<script type="text/javascript" src="js/echarts.js" ></script>
+    	<script type="text/javascript" src="js/commonfunc.js" ></script>
+		<link rel="stylesheet" href="css/layui.css"  media="all">
+		
+		
+		<script type="text/javascript" src="js/drawStackedLine.js" ></script>
+		<script type="text/javascript" src="js/drawRoadP.js" ></script>
+		<script type="text/javascript" src="js/Road_analyzer.js" ></script>
+		<script type="text/javascript" src="js/drawAG.js" ></script>
+
+		<script type="text/javascript" src="js/jysg_clickFuncs.js" ></script>
+		<script src="js/drawMap.js"></script>
+    	<script src="js/drawDfld.js"></script>
+    	<script type="text/javascript" src="js/jysg_start.js" ></script>
+    	<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+		
+		<link rel="stylesheet" href="css/content_jysg.css" />
+		<style type="text/css">
+    	</style>
+    	
+	</head>
+	
+	<body style="background-color:white;">
+		<div id="content" >
+			
+		<div id="contentA">
+			<svg id="graphA1" width="300" height="250"></svg>
+		</div>
+
+		
+		<div id="contentB">
+			
+		</div>
+		
+		<div id="contentC">
+			<svg id="graphC" width="600" height="540"></svg>
+			<div id="mark"></div>
+		</div>
+		
+		<div id="contentD">
+		</div>
+		
+		<div id="contentE" >
+			<div id="main" style="width: 850px;height:200px;">
+			</div>
+			<div id = "input" style="width: 800px;">
+				
+			</div>
+		</div>
+		<div id="contentF" >
+		
+			<button class="layui-btn layui-btn-primary layui-btn-radius"onclick="clickbtnA4()">重置</button>
+			
+				<div class="layui-input-inline">
+        <input type="tel" id = "threodput" lay-verify="required" autocomplete="off" class="layui-input">
+      </div>
+				
+				<button class="layui-btn layui-btn-primary layui-btn-radius" id = "commitButton" onclick="confirm()">识别</button>
+				<button class="layui-btn layui-btn-primary layui-btn-radius layui-btn-disabled" disabled="disabled" id = "saveButton" onclick="saveServie()">保存</button>
+		</div>
+	
+		</div>
+	</body>
+	<script>
+	//全局变量
+	window.years = ["2014","2015","2016"];
+	window.months = ["0"];
+	window.originYears = ["2014","2015","2016"];
+	window.originRoads =["徽州大道","马鞍山路","芜湖路","黄山路","怀宁路","休宁路","金寨路","九华山路"];
+	window.yflags = [0,0,0];
+	window.road = "休宁路";
+	window.attrs = ["tq", "dcsg","sgxt"];
+	window.attrFlag = ["0","0","0"];
+	window.roadList=["徽州大道","马鞍山路","芜湖路","黄山路","怀宁路","休宁路","金寨路","九华山路"];
+	window.data=[];
+	window.hotdata="";
+	var map = new BMap.Map("contentD", {enableMapClick:false});
+	map.centerAndZoom("合肥",15);
+	map.enableScrollWheelZoom(true); 
+	jysg_start();
+	</script>
+	
+</html>

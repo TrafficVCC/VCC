@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="hfut.vcc.mapping.DfldMapper">
+
+	<select id="selectMaxjdwz" parameterType="String" resultType="int">
+    	select maxjdwz
+    	from roadjdwz
+    	where lm = #{lm}
+    </select>
+	
+	<insert id="insertDfld" useGeneratedKeys="true"
+    keyProperty="id">
+   	    insert into dfld (lng, lat, distance, way, sgld, degree) values
+  		<foreach item="item" collection="list" separator=",">
+    		(#{item.lng}, #{item.lat}, #{item.distance}, #{item.way}, #{item.sgld}, #{item.degree})
+  		</foreach>
+	</insert>
+	
+</mapper>

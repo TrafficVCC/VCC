@@ -27,9 +27,7 @@ public class RoadNetServlet extends HttpServlet {
 	
 	private JSONArray js_jdwz;
 	private JSONArray js_road;
-	private JSONArray js_xzqh;
-	private JSONArray js_sgdd;
-       
+	private JSONArray js_coor;
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -42,48 +40,59 @@ public class RoadNetServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		Map<String,String> params = new HashMap<String,String>();
-		//鑾峰彇鎵�鏈夊弬鏁伴泦鍚�(鐢变簬涓嶇‘瀹氬墠绔紶鏉ョ殑鏈夊摢浜涘弬鏁帮紝鎵�浠ラ渶鑾峰彇鍏舵墍鏈夊弬鏁�)
-        Map<String, String[]> parameterMap=request.getParameterMap();  
-        for(String key : parameterMap.keySet()){  
-            params.put(key, parameterMap.get(key)[0]);
-        }  
+		// TODO Auto-generated method stub		
+		String type = request.getParameter("type");
+		String[] year = request.getParameterValues("year[]");	//一定注意获取前端数组时要在字段后加上[]
+		String[] month = request.getParameterValues("month[]");
+		String lm = request.getParameter("lm");
+		
+		Map<String,Object> params = new HashMap<String,Object>();
+		params.put("year", (String[])year);
+		params.put("month", (String[])month);
+		params.put("lm", lm);
         
         JSONArray js = new JSONArray();
 		try {
-			if(params.get("type").equals("road")) {
-				getJSONData(params);
-				JSONArray js_index = new JSONArray();	//鏌ユ壘浣嶇疆
-				JSONArray js_pos = new JSONArray();	//瀛樺偍缁濆浣嶇疆瀵瑰簲鐨勭粡绾害鍧愭爣
+				if(type.equals("road")) {	//如果type为road表示坐标还没计算
+					
+					getJdwzData(params);
+					JSONArray js_index = new JSONArray();	//每个jdwz的索引,位于roadnet中哪两个点之间
+					JSONArray js_pos = new JSONArray();		//计算出的jdwz对应的经纬度
+					//获得道路的最大距离
+					int max_dist = js_road.getJSONObject(js_road.length()-1).getInt("distance");
+					int max_jdwz = js_jdwz.getJSONObject(js_jdwz.length()-1).getInt("jdwz");
+					System.out.println(max_jdwz);
+					//int max_jdwz = 2571;
+					//换算关系比(将jdwz位置映射到道路的范围内)
+					double rate = (double)max_dist / max_jdwz;
+					
+					for(int i=0; i<js_jdwz.length(); i++) {
+						int jdwz = js_jdwz.getJSONObject(i).getInt("jdwz");
+						int jdwz2 = (int)Math.round(jdwz * rate);	//映射后的jdwz
+						js_jdwz.getJSONObject(i).put("jdwz2", jdwz2);
+						System.out.println(jdwz+" "+jdwz2);
+						js_index.put(BinarySearch(js_road, jdwz2));
+					}
+					for(int i=0; i<js_index.length(); i++) {
+						JSONObject obj = getCoordinate(js_road, js_jdwz.getJSONObject(i).getInt("jdwz2"), js_index.getInt(i));
+						obj.put("count", js_jdwz.getJSONObject(i).getInt("count"));
+						obj.put("jdwz", js_jdwz.getJSONObject(i).getInt("jdwz"));
+						js_pos.put(obj);
+					}
+					JSONObject obj = new JSONObject();
+					obj.put("road", js_road);
+					obj.put("location", js_pos);
+					js.put(obj);
+				}
 				
-				for(int i=0; i<js_jdwz.length(); i++) {
-					js_index.put(BinarySearch(js_road, js_jdwz.getJSONObject(i).getInt("jdwz")));
+				else if(type.equals("coor")) {	//type为coor,则表示坐标已计算好,直接查询即可
+					getCoorData(params);
+					JSONObject obj = new JSONObject();
+					obj.put("road", js_road);
+					obj.put("location", js_coor);
+					js.put(obj);
 				}
-				for(int i=0; i<js_index.length(); i++) {
-					JSONObject obj = getCoordinate(js_road, js_jdwz.getJSONObject(i).getInt("jdwz"), js_index.getInt(i));
-					obj.put("count", js_jdwz.getJSONObject(i).getInt("count"));
-					obj.put("sgdd", js_jdwz.getJSONObject(i).getString("sgdd"));
-					//obj.put("sgdd", js_jdwz.getJSONObject(i).getString("sgdd"));
-					js_pos.put(obj);
-				}
-				JSONObject obj = new JSONObject();
-				obj.put("road", js_road);
-				obj.put("location", js_pos);
-				js.put(obj);
-			}
-			
-			else if(params.get("type").equals("sgdd")){
-				getJSONData(params);
-				JSONObject obj = new JSONObject();
-				obj.put("road", js_road);
-				obj.put("location", js_sgdd);
-				js.put(obj);
-			}
-			else {
-				getxzqhJSON(params);
-				js = js_xzqh;
-			}
+				
 		}
 		catch(JSONException e) {
 			e.printStackTrace();
@@ -105,34 +114,32 @@ public class RoadNetServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private void getJSONData(Map<String,String> params) throws JSONException, IllegalArgumentException {
+	private void getCoorData(Map<String,Object> params) throws JSONException, IllegalArgumentException {
+		SqlSession session = MyBatisUtil.getSqlSession();
+		RoadNetMapper roadnet = session.getMapper(RoadNetMapper.class);
+		
+		List<Map<String,Object>> li_coor = new ArrayList<Map<String,Object>>();
+		List<Map<String,Object>> li_road = new ArrayList<Map<String,Object>>();
+		li_coor = roadnet.selectCoor(params);
+		li_road = roadnet.selectRoad((String)params.get("lm"));
+		
+		js_coor = MySqlUtil.listToJSON(li_coor);
+		js_road = MySqlUtil.listToJSON(li_road);
+		
+	}
+	
+	private void getJdwzData(Map<String,Object> params) throws JSONException, IllegalArgumentException {
 		SqlSession session = MyBatisUtil.getSqlSession();
 		RoadNetMapper roadnet = session.getMapper(RoadNetMapper.class);
 		
 		List<Map<String,Object>> li_jdwz = new ArrayList<Map<String,Object>>();
 		List<Map<String,Object>> li_road = new ArrayList<Map<String,Object>>();
-		List<Map<String,Object>> li_sgdd = new ArrayList<Map<String,Object>>();
 		li_jdwz = roadnet.selectjdwz(params);
-		li_road = roadnet.selectRoad(params.get("lm"));
-		li_sgdd = roadnet.selectsgdd(params);
+		li_road = roadnet.selectRoad((String)params.get("lm"));
 		//System.out.println(li);
 		
 		js_jdwz = MySqlUtil.listToJSON(li_jdwz);
 		js_road = MySqlUtil.listToJSON(li_road);
-		js_sgdd = MySqlUtil.listToJSON(li_sgdd);
-		
-		session.close();
-	}
-	
-	private void getxzqhJSON(Map<String,String> params) throws JSONException, IllegalArgumentException {
-		SqlSession session = MyBatisUtil.getSqlSession();
-		RoadNetMapper roadnet = session.getMapper(RoadNetMapper.class);
-		
-		List<Map<String,Object>> li_xzqh = new ArrayList<Map<String,Object>>();
-		li_xzqh = roadnet.selectxzqh(params);
-		//System.out.println(li);
-		
-		js_xzqh = MySqlUtil.listToJSON(li_xzqh);
 		
 		session.close();
 	}
@@ -165,12 +172,12 @@ public class RoadNetServlet extends HttpServlet {
 		if(index == -1) {
 			coor.put("lng_jdwz", js_road.getJSONObject(index).getDouble("lng"));
 			coor.put("lat_jdwz", js_road.getJSONObject(index).getDouble("lat"));
-			coor.put("jdwz", jdwz);
+			coor.put("jdwz2", jdwz);
 		}
 		if(jdwz == distance) {
 			coor.put("lng_jdwz", js_road.getJSONObject(index).getDouble("lng"));
 			coor.put("lat_jdwz", js_road.getJSONObject(index).getDouble("lat"));
-			coor.put("jdwz", jdwz);
+			coor.put("jdwz2", jdwz);
 		}
 		else {
 			double lng1 = js_road.getJSONObject(index-1).getDouble("lng");
@@ -182,7 +189,7 @@ public class RoadNetServlet extends HttpServlet {
 		
 			double lng = Double.compare(d1, d2) == 0 ? (lng1+lng2)/2 : (jdwz - d1)/(d2 - d1) * (lng2 - lng1) + lng1;
 			double lat = Double.compare(d1, d2) == 0 ? (lat1+lat2)/2 : (jdwz - d1)/(d2 - d1) * (lat2 - lat1) + lat1;
-			coor.put("jdwz", jdwz);
+			coor.put("jdwz2", jdwz);
 			coor.put("lng_jdwz", lng);
 			coor.put("lat_jdwz", lat);
 		}

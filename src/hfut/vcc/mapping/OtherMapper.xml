@@ -51,28 +51,34 @@
 		group by ${attr1}, ${attr2}
      </select>
      
-  	<!-- 支持多选,一个属性同时多个值 -->
-     <select id="factorQuery2" parameterType="hashmap" resultType="java.util.LinkedHashMap" statementType="STATEMENT">
-     	select ${attr1}, ${attr2}, count(*) as count
+  	<!-- 支持多选,一个属性同时多个值 --> <!-- ifnull判断某个字段是否为null,是就用"null"代替 -->
+     <select id="factorQuery2" parameterType="hashmap" resultType="java.util.LinkedHashMap" >
+     	select ifnull(${attr1},"null") as ${attr1}, ifnull(${attr2},"null") as ${attr2}, count(*) as count
      	from jysg
-     	<![CDATA[ where YEAR(sgfssj) >= ${starty} and YEAR(sgfssj) <= ${endy} ]]>
-     	<if test='set!="0"'>
-			and lh = ${set}
-		</if>
-		
-		<if test='content1Array != null and content1Array[0] != "0"'>
-			and ${attr1} in
-			<foreach collection="content1Array" item="item" open="(" close=")" separator=",">
-               ${item}
+     	where sgfssj is not null
+     	<if test='year != null and year[0] != "0"'>
+			and YEAR(sgfssj) in
+			<foreach collection="year" item="item" open="(" close=")" separator=",">
+               	${item}
             </foreach>
-		</if>
-		
-		<if test='content2Array != null and content2Array[0] != "0"'>
-			and ${attr2} in
-			<foreach collection="content2Array" item="item" open="(" close=")" separator=",">
-               ${item}
+		</if> 
+     	
+     	<if test='set != null and set[0] != "0"'>
+			and lm in
+			<foreach collection="set" item="item" open="(" close=")" separator=",">
+               	#{item}
             </foreach>
-		</if>
+		</if>       
+		
+		<foreach collection="allAttr" item="item">
+        	<if test='item.content != null and item.content[0] != "0"'>
+				and ${item.attr} in
+				<foreach collection="item.content" item="item2" open="(" close=")" separator=",">
+               		${item2}
+            	</foreach>
+			</if>
+        </foreach>
+		
 		group by ${attr1}, ${attr2}
 		order by ${attr1}, ${attr2}
      </select>

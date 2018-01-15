@@ -3,17 +3,15 @@
 
 <mapper namespace="hfut.vcc.mapping.CoordinateMapper">
 	
-	<update id="updateCoorBatch" parameterType="List">
-		<foreach collection="list" item="RoadCoor" separator=";">  
+	<update id="updateCoorBatch" parameterType="hashmap">
+		<foreach collection="data" item="RoadCoor" separator=";">  
     		UPDATE jysg 		
      		<set>  
        			lng_jdwz = #{RoadCoor.lng_jdwz},  
-       			lat_jdwz = #{RoadCoor.lat_jdwz},  
-       			lng_sgdd = #{RoadCoor.lng_sgdd},  
-       			lat_sgdd = #{RoadCoor.lat_sgdd}
+       			lat_jdwz = #{RoadCoor.lat_jdwz}
      		</set>  
      		<where>  
-       			sgdd = #{RoadCoor.sgdd} AND jdwz=#{RoadCoor.jdwz}  
+       			jdwz=#{RoadCoor.jdwz} and lm = #{lm} 
      		</where>  
   		</foreach>
 	</update>

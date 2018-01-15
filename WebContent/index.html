@@ -1,120 +1,69 @@
-
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<title>分析系统</title>
-	<meta name="renderer" content="webkit">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="format-detection" content="telephone=no">
-  	
-  	<!--加载百度地图API库-->
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YHKeHhFlknc84X3Xq0HmMQfainbDgegu"></script>
-    <script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
-    <script type="text/javascript" src="http://api.map.baidu.com/library/DistanceTool/1.2/src/DistanceTool_min.js"></script>
-	<script type="text/javascript" src="js/d3.v3.min.js" ></script>
-	<script type="text/javascript" src="js/jquery-3.2.1.js" ></script>
-	<script type="text/javascript" src="js/drawLineByYear.js" ></script>
-	<script type="text/javascript" src="js/drawRoseGraph.js" ></script>
-	<script type="text/javascript" src="js/drawRoadPie.js" ></script>
-	<script type="text/javascript" src="js/drawCalendar.js" ></script>
-	<script type="text/javascript" src="js/drawYearCal.js" ></script>
-	<script type="text/javascript" src="js/drawScatters.js" ></script>
-	<script type="text/javascript" src="datas.js" ></script>
-	<script type="text/javascript" src="read.js" ></script>
-	<script type="text/javascript" src="js/showTimeAnalyze.js" ></script>
-	<script type="text/javascript" src="js/showSpaceAnalyze.js" ></script>
-	<script type="text/javascript" src="js/showDataAnalyze.js" ></script>
-	<script type="text/javascript" src="js/roadmap.js" ></script>
-  
-	<link rel="stylesheet" href="css/layui.css"  media="all">
-	<link rel="stylesheet" href="css/content.css" >
-	
+    <title></title>
+    <link type="text/css" rel="Stylesheet" href="cDesk/theme/default/default.css" />
 </head>
-<body class="layui-layout-body">
-<div class="layui-layout layui-layout-admin">
-  <div class="layui-header">
-    <div class="layui-logo">交通事故分析</div>
-    <!-- 头部区域（可配合layui已有的水平导航） -->
-    <ul class="layui-nav layui-layout-left">
-      <li class="layui-nav-item"><a href="javascript:showDataAnalyze();">数据分析</a></li>
-      <li class="layui-nav-item"><a href="mapTool.html">道路提取</a></li>
-    </ul>
-    
-  </div>
-  
-  <div class="layui-side layui-bg-black">
-    <div class="layui-side-scroll">
-      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
-      	<li class="layui-nav-item layui-nav-itemed">
-          <a id="timeAnalyze" class="" href="javascript:showTimeAnalyze();" >时间分析</a>
-          <dl class="layui-nav-child">
-            <dd><a href="javascript:;">列表一</a></dd>
-            <dd><a href="javascript:;">列表二</a></dd>
-            <dd><a href="javascript:;">列表三</a></dd>
-          </dl>
-      	</li>
-        <li class="layui-nav-item">
-        	<a href="javascript:showSpaceAnalyze();">空间分析</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-  
-  <div class="layui-body" >
-    <!-- 内容主体区域 -->
-    <div id="content1" >
-	    <div class="PA" >
-	    <svg id="timeA" class="" width="650" height="250"  ></svg>
-	    </div>
-	    <div class="PB" id="PBMap" style="background-color: bisque;">
-	   		 MAP    
-	    </div>
-	    <div class="PC" style="float: left;">
-	    <svg id="timeC1" width="200" height="200" ></svg>
-	    </div>
-	    <div style="float: left;" >
-	    <svg id="timeC2" width="200" height="200" ></svg>
-	     </div>
-	    <div style="float: left;">
-	   	<svg id="timeC3" width="200" height="200" ></svg>
-	    </div>
-	    <div class="PD">
-	    <svg id="timeD" width="1600" height="800" ></svg>
-	    </div> 
-      
-    </div>
-    <div id="content2">
-    	<div class="SA">
-    		<svg id="spaceA" width="500" height="500"></svg>
-    	</div>
-    	<div class="SB" id="SBMap" style="background-color: bisque;">
-    		MAP
-    	</div>
-    	<div class="SC">
-    		<svg id="spaceC" width="250" height="250"></svg>
-    	</div>
-    	<div class="SD">
-    		<svg id="spaceD" width="1000" height="250"></svg>
-    	</div>
-    </div>
-  </div>
-  
-  
-  <div class="layui-footer">
-
-  </div>
-</div>
-<script src="js/layui.all.js" charset="utf-8"></script>
-
-<script>
-//创建地图
-displayMap("PBMap");
-displayMap("SBMap");
-</script>
+<body>
 
 </body>
 </html>
+<script type="text/javascript" src="cDesk/cDesk-2.5.min.js"></script>
+<script type="text/javascript" src="js/cdesk_config.js" ></script>
+<script type="text/javascript">
+    
+    var calendarYearbtn = cDesk.AppButton().getInstance({
+        appName: '路网提取' ,
+        appUrl: 'http://localhost:8080/RoadMap/LoadRoad.html',
+		appIcon:'',
+        appClickHandle: function (calendarYearbtn) {
+            var win = cDesk.Windows().getInstance(desk, calendarYearbtn, {
+            	windowWidth:1595,
+        		windowHeight:903,
+                CloseCallback: function () {
+                	
+                    cDesk.Taskbar.DelTask(win);
+                }
+            });
+            cDesk.Taskbar.AddTask(win);
+        }
+    });
+    desk.AddAppToDesk(0, calendarYearbtn);
+   
+    var calendarYearbtn = cDesk.AppButton().getInstance({
+        appName: '道路展示图' ,
+        appUrl: '#',
+		appIcon:'',
+        appClickHandle: function (calendarYearbtn) {
+            var win = cDesk.Windows().getInstance(desk, calendarYearbtn, {
+            	windowWidth:1595,
+        		windowHeight:903,
+                CloseCallback: function () {
+                    cDesk.Taskbar.DelTask(win);
+                }
+            });
+            cDesk.Taskbar.AddTask(win);
+        }
+    });
+    desk.AddAppToDesk(1, calendarYearbtn);
+    
+    var AccidentA = cDesk.AppButton().getInstance({
+        appName: '热点分析' ,
+        appUrl: 'index_jysg3.html',
+		appIcon:'',
+		
+        appClickHandle: function (calendarYearbtn) {
+            var win = cDesk.Windows().getInstance(desk, calendarYearbtn, {
+            	windowWidth:1595,
+        		windowHeight:903,
+                CloseCallback: function () {
+                    cDesk.Taskbar.DelTask(win);
+                }
+            });
+            cDesk.Taskbar.AddTask(win);
+        }
+    });
+    desk.AddAppToDesk(2, AccidentA);
+  
+  
+</script>
